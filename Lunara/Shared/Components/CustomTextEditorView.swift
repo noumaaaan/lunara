@@ -14,9 +14,6 @@ private enum Constants {
     static let horizontalPadding: CGFloat = 16
     static let verticalPadding: CGFloat = 14
 
-    static let borderColor = LunaraColor.borderColor
-    static let focusedBorderColor = LunaraColor.cream.opacity(0.8)
-
     static let textColor = LunaraColor.cream
     static let placeholderColor = LunaraColor.cream.opacity(0.65)
 }
@@ -37,8 +34,8 @@ struct CustomTextEditorView: View {
                     RoundedRectangle(cornerRadius: Constants.cornerRadius, style: .continuous)
                         .stroke(
                             isFocused.wrappedValue
-                            ? Constants.focusedBorderColor
-                            : Constants.borderColor,
+                            ? LunaraColor.focusedBorderColor
+                            : LunaraColor.borderColor,
                             lineWidth: 1
                         )
                 }

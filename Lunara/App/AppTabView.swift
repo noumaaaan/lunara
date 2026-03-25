@@ -27,7 +27,7 @@ struct AppTabView: View {
                 .tag(TabOption.journal)
 
                 NavigationStack {
-                    LogDreamView()
+                    LogDreamScreenOneView()
                         .toolbar(.hidden, for: .tabBar)
                 }
                 .tag(TabOption.log)

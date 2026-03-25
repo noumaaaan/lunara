@@ -1,5 +1,5 @@
 //
-//  LogDreamView.swift
+//  LogDreamScreenTwoView.swift
 //  Lunara
 //
 //  Created by Noumaan Mehmood on 25/03/2026.
@@ -16,7 +16,7 @@ private enum Constants {
     static let bottomContentPadding: CGFloat = 100
 }
 
-struct LogDreamView: View {
+struct LogDreamScreenTwoView: View {
     @Environment(\.modelContext) private var modelContext
 
     @StateObject private var viewModel = LogDreamViewModel()
@@ -55,7 +55,7 @@ struct LogDreamView: View {
         .toolbarColorScheme(.dark, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .principal) {
-                Text("Log Dream")
+                Text("Log Dream Details")
                     .font(.manropeBold(size: 18))
                     .foregroundStyle(LunaraColor.cream)
             }
@@ -71,7 +71,7 @@ struct LogDreamView: View {
     }
 }
 
-private extension LogDreamView {
+private extension LogDreamScreenTwoView {
     var titleSection: some View {
         CustomTextField(
             text: $viewModel.title,
@@ -85,7 +85,6 @@ private extension LogDreamView {
         VStack(alignment: .leading, spacing: .zero) {
             Text("So, what happened?")
                 .font(LunaraFont.lightBodySmall)
-//                .font(.manropeLight(size: 14))
                 .foregroundStyle(LunaraColor.cream.opacity(0.9))
                 .padding(.bottom, 10)
 
@@ -130,8 +129,7 @@ private extension LogDreamView {
     }
 }
 
+
 #Preview {
-    NavigationStack {
-        LogDreamView()
-    }
+    LogDreamScreenTwoView()
 }

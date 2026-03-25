@@ -9,6 +9,6 @@ import Foundation
 
 enum LunaraLayout {
     
-    static let cornerRadius: CGFloat = 20
+    static let cornerRadius: CGFloat = 15
     
 }

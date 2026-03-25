@@ -8,6 +8,8 @@
 import Foundation
 import SwiftUI
 
+
+
 enum LunaraColor {
     
     // Main colors
@@ -18,8 +20,8 @@ enum LunaraColor {
     static let tertiary: Color = Color(hex: "#735A8C")
     
     static let borderColor: Color = cream.opacity(0.2)
+    static let focusedBorderColor: Color = LunaraColor.cream.opacity(0.8)
     static let tabBarColor: Color = Color(hex: "#101634")
-    
     
 //    // MARK: - Brand Palette
 //    static let oxfordBlue = Color(hex: "#11253C")
