@@ -17,6 +17,7 @@ private enum Constants {
 
 struct LogDreamScreenOneView: View {
     @Environment(\.modelContext) private var modelContext
+    @EnvironmentObject private var router: AppRouter
 
     @StateObject private var viewModel = LogDreamViewModel()
     @FocusState private var isDreamContentFocused: Bool
@@ -125,9 +126,18 @@ private extension LogDreamScreenOneView {
 
     func saveDream() {
         do {
-            try viewModel.saveDream(using: modelContext)
+            let savedEntry = try viewModel.saveDream(using: modelContext)
+
             isDreamContentFocused = false
             isTitleFocused = false
+
+            router.savedDreamToastMessage = "Dream saved"
+            router.pendingJournalEntryID = savedEntry.id
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                router.savedDreamToastMessage = nil
+                router.selectedTab = .journal
+            }
         } catch {
             print("Failed to save dream: \(error)")
         }
@@ -137,5 +147,6 @@ private extension LogDreamScreenOneView {
 #Preview {
     NavigationStack {
         LogDreamScreenOneView()
+            .environmentObject(AppRouter())
     }
 }

@@ -8,12 +8,11 @@
 import SwiftUI
 
 struct AppTabView: View {
-    @State private var selectedTab: TabOption = .log
-    @StateObject private var keyboard = KeyboardObserver()
+    @StateObject private var router = AppRouter()
 
     var body: some View {
         ZStack(alignment: .bottom) {
-            TabView(selection: $selectedTab) {
+            TabView(selection: $router.selectedTab) {
                 NavigationStack {
                     CalendarView()
                         .toolbar(.hidden, for: .tabBar)
@@ -44,13 +43,23 @@ struct AppTabView: View {
                 }
                 .tag(TabOption.preferences)
             }
+            .environmentObject(router)
 
-            if !keyboard.isKeyboardVisible {
-                CustomTabView(selectedTab: $selectedTab)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
+            CustomTabView(selectedTab: $router.selectedTab)
+                .opacity(router.savedDreamToastMessage == nil ? 1 : 0)
+        }
+        .overlay {
+            if let message = router.savedDreamToastMessage {
+                ZStack {
+                    Color.black.opacity(0.37)
+                        .ignoresSafeArea()
+
+                    SaveHUDView(message: message)
+                        .transition(.scale(scale: 0.94).combined(with: .opacity))
+                }
             }
         }
-        .animation(.easeInOut(duration: 0.25), value: keyboard.isKeyboardVisible)
+        .animation(.easeInOut(duration: 0.2), value: router.savedDreamToastMessage)
     }
 }
 

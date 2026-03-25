@@ -16,9 +16,10 @@ private enum Constants {
 
 struct LogDreamScreenTwoView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject private var router: AppRouter
 
     @ObservedObject var viewModel: LogDreamViewModel
-    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         ZStack {
@@ -29,12 +30,7 @@ struct LogDreamScreenTwoView: View {
                 VStack(alignment: .leading, spacing: Constants.sectionSpacing) {
                     DateSelectionView(selectedDate: $viewModel.dreamDate)
 
-                    CategorySelectionView(
-                        selectedCategory: Binding(
-                            get: { viewModel.selectedCategory },
-                            set: { viewModel.selectedCategory = $0 }
-                        )
-                    )
+                    CategorySelectionView(selectedCategory: $viewModel.selectedCategory)
 
                     DreamIntensityView(
                         selectedIntensity: Binding(
@@ -43,12 +39,7 @@ struct LogDreamScreenTwoView: View {
                         )
                     )
 
-                    WakingMoodSelectionView(
-                        selectedMood: Binding(
-                            get: { viewModel.selectedMood },
-                            set: { viewModel.selectedMood = $0 }
-                        )
-                    )
+                    WakingMoodSelectionView(selectedMood: $viewModel.selectedMood)
 
                     saveSection
                 }
@@ -87,8 +78,17 @@ private extension LogDreamScreenTwoView {
 
     func saveDream() {
         do {
-            try viewModel.saveDream(using: modelContext)
+            let savedEntry = try viewModel.saveDream(using: modelContext)
+
+            router.savedDreamToastMessage = "Dream saved"
+            router.pendingJournalEntryID = savedEntry.id
+
             dismiss()
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                router.savedDreamToastMessage = nil
+                router.selectedTab = .journal
+            }
         } catch {
             print("Failed to save dream: \(error)")
         }
@@ -98,5 +98,6 @@ private extension LogDreamScreenTwoView {
 #Preview {
     NavigationStack {
         LogDreamScreenTwoView(viewModel: LogDreamViewModel())
+            .environmentObject(AppRouter())
     }
 }
