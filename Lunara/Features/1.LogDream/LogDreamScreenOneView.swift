@@ -12,7 +12,6 @@ private enum Constants {
     static let screenPadding: CGFloat = 16
     static let sectionSpacing: CGFloat = 20
     static let titleFieldHeight: CGFloat = 50
-    
     static let bottomContentPadding: CGFloat = 100
 }
 
@@ -27,7 +26,8 @@ struct LogDreamScreenOneView: View {
     var body: some View {
         GeometryReader { proxy in
             ZStack {
-                LunaraColor.background.ignoresSafeArea()
+                LunaraColor.background
+                    .ignoresSafeArea()
 
                 ScrollView {
                     VStack(alignment: .leading, spacing: Constants.sectionSpacing) {
@@ -59,14 +59,19 @@ struct LogDreamScreenOneView: View {
                     .font(.manropeBold(size: 18))
                     .foregroundStyle(LunaraColor.cream)
             }
+
             ToolbarItemGroup(placement: .keyboard) {
                 Spacer()
+
                 Button("Done") {
                     isDreamContentFocused = false
                     isTitleFocused = false
                 }
                 .font(LunaraFont.body)
             }
+        }
+        .navigationDestination(isPresented: $shouldNavigateToDetails) {
+            LogDreamScreenTwoView(viewModel: viewModel)
         }
     }
 }
@@ -80,7 +85,7 @@ private extension LogDreamScreenOneView {
             isFocused: $isTitleFocused
         )
     }
-    
+
     func contentSection(editorMinHeight: CGFloat) -> some View {
         VStack(alignment: .leading, spacing: .zero) {
             Text("So, what happened?")

@@ -11,43 +11,51 @@ import SwiftData
 private enum Constants {
     static let screenPadding: CGFloat = 16
     static let sectionSpacing: CGFloat = 20
-    static let titleFieldHeight: CGFloat = 50
-    
     static let bottomContentPadding: CGFloat = 100
 }
 
 struct LogDreamScreenTwoView: View {
     @Environment(\.modelContext) private var modelContext
 
-    @StateObject private var viewModel = LogDreamViewModel()
-    @FocusState private var isDreamContentFocused: Bool
-    @FocusState private var isTitleFocused: Bool
-    @State private var shouldNavigateToDetails = false
+    @ObservedObject var viewModel: LogDreamViewModel
+    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
-        GeometryReader { proxy in
-            ZStack {
-                LunaraColor.background.ignoresSafeArea()
+        ZStack {
+            LunaraColor.background
+                .ignoresSafeArea()
 
-                ScrollView {
-                    VStack(alignment: .leading, spacing: Constants.sectionSpacing) {
-                        titleSection
-                        contentSection(editorMinHeight: proxy.size.height * 0.42)
-                        actionSection
-                    }
-                    .padding(Constants.screenPadding)
-                    .padding(.bottom, Constants.bottomContentPadding)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .frame(minHeight: proxy.size.height, alignment: .top)
+            ScrollView {
+                VStack(alignment: .leading, spacing: Constants.sectionSpacing) {
+                    DateSelectionView(selectedDate: $viewModel.dreamDate)
+
+                    CategorySelectionView(
+                        selectedCategory: Binding(
+                            get: { viewModel.selectedCategory },
+                            set: { viewModel.selectedCategory = $0 }
+                        )
+                    )
+
+                    DreamIntensityView(
+                        selectedIntensity: Binding(
+                            get: { viewModel.currentIntensity },
+                            set: { viewModel.selectedIntensity = $0.rawValue }
+                        )
+                    )
+
+                    WakingMoodSelectionView(
+                        selectedMood: Binding(
+                            get: { viewModel.selectedMood },
+                            set: { viewModel.selectedMood = $0 }
+                        )
+                    )
+
+                    saveSection
                 }
-                .scrollIndicators(.hidden)
-                .simultaneousGesture(
-                    TapGesture().onEnded {
-                        isDreamContentFocused = false
-                        isTitleFocused = false
-                    }
-                )
+                .padding(.top, Constants.screenPadding)
+                .padding(.bottom, Constants.bottomContentPadding)
             }
+            .scrollIndicators(.hidden)
         }
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.visible, for: .navigationBar)
@@ -55,81 +63,40 @@ struct LogDreamScreenTwoView: View {
         .toolbarColorScheme(.dark, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .principal) {
-                Text("Log Dream Details")
+                Text("Dream Details")
                     .font(.manropeBold(size: 18))
                     .foregroundStyle(LunaraColor.cream)
-            }
-            ToolbarItemGroup(placement: .keyboard) {
-                Spacer()
-                Button("Done") {
-                    isDreamContentFocused = false
-                    isTitleFocused = false
-                }
-                .font(LunaraFont.body)
             }
         }
     }
 }
 
 private extension LogDreamScreenTwoView {
-    var titleSection: some View {
-        CustomTextField(
-            text: $viewModel.title,
-            placeholder: "Optional title",
-            height: Constants.titleFieldHeight,
-            isFocused: $isTitleFocused
-        )
-    }
-    
-    func contentSection(editorMinHeight: CGFloat) -> some View {
-        VStack(alignment: .leading, spacing: .zero) {
-            Text("So, what happened?")
-                .font(LunaraFont.lightBodySmall)
-                .foregroundStyle(LunaraColor.cream.opacity(0.9))
-                .padding(.bottom, 10)
-
-            CustomTextEditorView(
-                text: $viewModel.content,
-                isFocused: $isDreamContentFocused
-            )
-            .frame(minHeight: editorMinHeight)
+    var saveSection: some View {
+        CustomButton(
+            title: "Save Dream",
+            style: .primary,
+            height: 56,
+            isDisabled: viewModel.isSaveDisabled
+        ) {
+            saveDream()
         }
-    }
-
-    var actionSection: some View {
-        VStack(spacing: 12) {
-            CustomButton(
-                title: "Next",
-                style: .primary,
-                height: 56,
-                isDisabled: viewModel.isSaveDisabled
-            ) {
-                shouldNavigateToDetails = true
-            }
-
-            CustomButton(
-                title: "Save for Now",
-                style: .secondary,
-                height: 50,
-                isDisabled: viewModel.isSaveDisabled
-            ) {
-                saveDream()
-            }
-        }
+        .padding(.horizontal, Constants.screenPadding)
+        .padding(.top, 4)
     }
 
     func saveDream() {
         do {
             try viewModel.saveDream(using: modelContext)
-            isDreamContentFocused = false
-            isTitleFocused = false
+            dismiss()
         } catch {
             print("Failed to save dream: \(error)")
         }
     }
 }
 
-
 #Preview {
-    LogDreamScreenTwoView()
+    NavigationStack {
+        LogDreamScreenTwoView(viewModel: LogDreamViewModel())
+    }
 }
