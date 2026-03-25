@@ -10,7 +10,8 @@ import SwiftUI
 
 enum LunaraFont {
     
-    
+    static let semiBoldBody = Font.manropeSemiBold(size: 16)
+    static let boldBody = Font.manropeBold(size: 16)
     static let body = Font.manropeRegular(size: 16)
     static let lightBody = Font.manropeLight(size: 16)
     static let bodySmall = Font.manropeRegular(size: 14)
