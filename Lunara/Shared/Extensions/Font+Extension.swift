@@ -40,19 +40,4 @@ extension Font {
     static func manropeExtraBold(size: CGFloat) -> Font {
         .custom("Manrope-ExtraBold", size: size)
     }
-    
-    // MARK: - Semantic styles
-    static let lunaraLargeTitle = Font.manropeBold(size: 34)
-    static let lunaraTitle = Font.manropeBold(size: 28)
-    static let lunaraTitle2 = Font.manropeSemiBold(size: 22)
-    static let lunaraHeadline = Font.manropeSemiBold(size: 17)
-    static let lunaraBody = Font.manropeRegular(size: 16)
-    static let lunaraBodyMedium = Font.manropeMedium(size: 16)
-    static let lunaraCallout = Font.manropeMedium(size: 15)
-    static let lunaraCaption = Font.manropeRegular(size: 13)
-    static let lunaraSmall = Font.manropeRegular(size: 12)
-    static let lunaraButton = Font.manropeSemiBold(size: 16)
-    static let lunaraNavTitle = Font.manropeSemiBold(size: 18)
-    static let lunaraTabLabel = Font.manropeMedium(size: 11)
-    static let lunaraLogo = Font.manropeBold(size: 30)
 }
