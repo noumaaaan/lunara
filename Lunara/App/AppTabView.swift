@@ -9,39 +9,71 @@ import SwiftUI
 
 struct AppTabView: View {
     @State private var selectedTab: TabOption = .log
+    @StateObject private var keyboard = KeyboardObserver()
 
     var body: some View {
         ZStack(alignment: .bottom) {
-            
-            LunaraColor.background.ignoresSafeArea()
-            
             TabView(selection: $selectedTab) {
-                CalendarView()
-                    .tag(TabOption.calendar)
-                    .toolbar(.hidden, for: .tabBar)
+                NavigationStack {
+                    CalendarView()
+                        .toolbar(.hidden, for: .tabBar)
+                }
+                .tag(TabOption.calendar)
 
-                JournalView()
-                    .tag(TabOption.journal)
-                    .toolbar(.hidden, for: .tabBar)
+                NavigationStack {
+                    JournalView()
+                        .toolbar(.hidden, for: .tabBar)
+                }
+                .tag(TabOption.journal)
 
-                LogDreamView()
-                    .tag(TabOption.log)
-                    .toolbar(.hidden, for: .tabBar)
+                NavigationStack {
+                    LogDreamView()
+                        .toolbar(.hidden, for: .tabBar)
+                }
+                .tag(TabOption.log)
 
-                InsightsView()
-                    .tag(TabOption.insights)
-                    .toolbar(.hidden, for: .tabBar)
+                NavigationStack {
+                    InsightsView()
+                        .toolbar(.hidden, for: .tabBar)
+                }
+                .tag(TabOption.insights)
 
-                PreferencesView()
-                    .tag(TabOption.preferences)
-                    .toolbar(.hidden, for: .tabBar)
+                NavigationStack {
+                    PreferencesView()
+                        .toolbar(.hidden, for: .tabBar)
+                }
+                .tag(TabOption.preferences)
             }
-            
-            CustomTabView(selectedTab: $selectedTab)
+
+            if !keyboard.isKeyboardVisible {
+                CustomTabView(selectedTab: $selectedTab)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
         }
+        .animation(.easeInOut(duration: 0.25), value: keyboard.isKeyboardVisible)
     }
 }
 
 #Preview {
     AppTabView()
+}
+
+import SwiftUI
+import Combine
+
+final class KeyboardObserver: ObservableObject {
+    @Published var isKeyboardVisible = false
+
+    private var cancellables = Set<AnyCancellable>()
+
+    init() {
+        NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)
+            .map { _ in true }
+            .merge(
+                with: NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)
+                    .map { _ in false }
+            )
+            .receive(on: RunLoop.main)
+            .assign(to: &$isKeyboardVisible)
+    }
 }

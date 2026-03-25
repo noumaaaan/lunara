@@ -9,7 +9,7 @@ import SwiftUI
 
 private enum Constants {
     // Layout
-    static let selectedPillWidth: CGFloat = 82
+    static let selectedPillWidth: CGFloat = 80
     static let selectedPillHeight: CGFloat = 55
     static let iconSize: CGFloat = 22
     static let hstackPadding: CGFloat = 15
@@ -77,8 +77,8 @@ struct CustomTabView: View {
                 }
                 .shadow(color: Constants.tabShadowColor, radius: 20, x: 0, y: 10)
         )
-        .padding(.horizontal, 20)
-        .padding(.bottom, 12)
+        .padding(.horizontal, 12)
+        .padding(.bottom, 5)
     }
 }
 
