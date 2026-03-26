@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		8C61646C2F74CE9D004E55F7 /* HorizonCalendar in Frameworks */ = {isa = PBXBuildFile; productRef = 8C61646B2F74CE9D004E55F7 /* HorizonCalendar */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		8C8879E92F731BC400D01B24 /* Lunara.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Lunara.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -36,6 +40,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8C61646C2F74CE9D004E55F7 /* HorizonCalendar in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +83,7 @@
 			);
 			name = Lunara;
 			packageProductDependencies = (
+				8C61646B2F74CE9D004E55F7 /* HorizonCalendar */,
 			);
 			productName = Lunara;
 			productReference = 8C8879E92F731BC400D01B24 /* Lunara.app */;
@@ -107,6 +113,9 @@
 			);
 			mainGroup = 8C8879E02F731BC300D01B24;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				8C61646A2F74CE9D004E55F7 /* XCRemoteSwiftPackageReference "HorizonCalendar" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 8C8879EA2F731BC400D01B24 /* Products */;
 			projectDirPath = "";
@@ -347,6 +356,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		8C61646A2F74CE9D004E55F7 /* XCRemoteSwiftPackageReference "HorizonCalendar" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/airbnb/HorizonCalendar";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		8C61646B2F74CE9D004E55F7 /* HorizonCalendar */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8C61646A2F74CE9D004E55F7 /* XCRemoteSwiftPackageReference "HorizonCalendar" */;
+			productName = HorizonCalendar;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 8C8879E12F731BC300D01B24 /* Project object */;
 }
