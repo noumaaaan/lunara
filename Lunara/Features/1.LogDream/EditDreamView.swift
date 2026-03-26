@@ -95,6 +95,38 @@ struct EditDreamView: View {
                 .font(LunaraFont.body)
             }
         }
+        .overlay {
+            if let errorState = viewModel.errorState {
+                ZStack {
+                    Color.black.opacity(0.37)
+                        .ignoresSafeArea()
+                        .onTapGesture {
+                            withAnimation(LunaraAnimation.quickEase) {
+                                viewModel.clearError()
+                            }
+                        }
+
+                    ConfirmationDialogView(
+                        title: errorState.title,
+                        message: errorState.message,
+                        primaryButtonTitle: "Okay",
+                        showsCancelButton: false,
+                        primaryAction: {
+                            withAnimation(LunaraAnimation.quickEase) {
+                                viewModel.clearError()
+                            }
+                        },
+                        dismissAction: {
+                            withAnimation(LunaraAnimation.quickEase) {
+                                viewModel.clearError()
+                            }
+                        }
+                    )
+                    .transition(.opacity.combined(with: .scale(scale: 0.96)))
+                }
+            }
+        }
+        .animation(LunaraAnimation.quickEase, value: viewModel.errorState != nil)
     }
 }
 

@@ -59,6 +59,38 @@ struct LogDreamScreenTwoView: View {
                     .foregroundStyle(LunaraColor.cream)
             }
         }
+        .overlay {
+            if let errorState = viewModel.errorState {
+                ZStack {
+                    Color.black.opacity(0.37)
+                        .ignoresSafeArea()
+                        .onTapGesture {
+                            withAnimation(LunaraAnimation.quickEase) {
+                                viewModel.clearError()
+                            }
+                        }
+
+                    ConfirmationDialogView(
+                        title: errorState.title,
+                        message: errorState.message,
+                        primaryButtonTitle: "Okay",
+                        showsCancelButton: false,
+                        primaryAction: {
+                            withAnimation(LunaraAnimation.quickEase) {
+                                viewModel.clearError()
+                            }
+                        },
+                        dismissAction: {
+                            withAnimation(LunaraAnimation.quickEase) {
+                                viewModel.clearError()
+                            }
+                        }
+                    )
+                    .transition(.opacity.combined(with: .scale(scale: 0.96)))
+                }
+            }
+        }
+        .animation(LunaraAnimation.quickEase, value: viewModel.errorState != nil)
     }
 }
 
@@ -68,7 +100,7 @@ private extension LogDreamScreenTwoView {
             title: "Save Dream",
             style: .primary,
             height: 56,
-            isDisabled: viewModel.isSaveDisabled
+            isDisabled: viewModel.isSaveDisabled || viewModel.isSaving
         ) {
             saveDream()
         }
@@ -77,18 +109,12 @@ private extension LogDreamScreenTwoView {
     }
 
     func saveDream() {
+        guard !viewModel.isSaving else { return }
+
         do {
             let savedEntry = try viewModel.saveDream(using: modelContext)
-
-            router.toastMessage = "Dream saved"
-            router.pendingJournalEntryID = savedEntry.id
-
             dismiss()
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                router.toastMessage = nil
-                router.selectedTab = .journal
-            }
+            router.handleDreamSaved(savedEntry.id)
         } catch {
             print("Failed to save dream: \(error)")
         }

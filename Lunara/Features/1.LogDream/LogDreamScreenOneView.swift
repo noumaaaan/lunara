@@ -74,6 +74,38 @@ struct LogDreamScreenOneView: View {
         .navigationDestination(isPresented: $shouldNavigateToDetails) {
             LogDreamScreenTwoView(viewModel: viewModel)
         }
+        .overlay {
+            if let errorState = viewModel.errorState {
+                ZStack {
+                    Color.black.opacity(0.37)
+                        .ignoresSafeArea()
+                        .onTapGesture {
+                            withAnimation(LunaraAnimation.quickEase) {
+                                viewModel.clearError()
+                            }
+                        }
+
+                    ConfirmationDialogView(
+                        title: errorState.title,
+                        message: errorState.message,
+                        primaryButtonTitle: "Okay",
+                        showsCancelButton: false,
+                        primaryAction: {
+                            withAnimation(LunaraAnimation.quickEase) {
+                                viewModel.clearError()
+                            }
+                        },
+                        dismissAction: {
+                            withAnimation(LunaraAnimation.quickEase) {
+                                viewModel.clearError()
+                            }
+                        }
+                    )
+                    .transition(.opacity.combined(with: .scale(scale: 0.96)))
+                }
+            }
+        }
+        .animation(LunaraAnimation.quickEase, value: viewModel.errorState != nil)
     }
 }
 
@@ -108,7 +140,7 @@ private extension LogDreamScreenOneView {
                 title: "Next",
                 style: .primary,
                 height: 56,
-                isDisabled: viewModel.isSaveDisabled
+                isDisabled: viewModel.isSaveDisabled || viewModel.isSaving
             ) {
                 shouldNavigateToDetails = true
             }
@@ -117,7 +149,7 @@ private extension LogDreamScreenOneView {
                 title: "Save for Now",
                 style: .secondary,
                 height: 50,
-                isDisabled: viewModel.isSaveDisabled
+                isDisabled: viewModel.isSaveDisabled || viewModel.isSaving
             ) {
                 saveDream()
             }
@@ -125,19 +157,13 @@ private extension LogDreamScreenOneView {
     }
 
     func saveDream() {
+        guard !viewModel.isSaving else { return }
+
         do {
             let savedEntry = try viewModel.saveDream(using: modelContext)
-
             isDreamContentFocused = false
             isTitleFocused = false
-
-            router.toastMessage = "Dream saved"
-            router.pendingJournalEntryID = savedEntry.id
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                router.toastMessage = nil
-                router.selectedTab = .journal
-            }
+            router.handleDreamSaved(savedEntry.id)
         } catch {
             print("Failed to save dream: \(error)")
         }

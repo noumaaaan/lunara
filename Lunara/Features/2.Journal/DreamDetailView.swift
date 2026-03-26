@@ -22,6 +22,7 @@ struct DreamDetailView: View {
 
     @State private var showDeleteDialog = false
     @State private var showEditSheet = false
+    @State private var errorState: AppErrorState?
 
     var body: some View {
         ZStack {
@@ -94,6 +95,38 @@ struct DreamDetailView: View {
                 }
             }
         }
+        .overlay {
+            if let errorState {
+                ZStack {
+                    Color.black.opacity(0.37)
+                        .ignoresSafeArea()
+                        .onTapGesture {
+                            withAnimation(LunaraAnimation.quickEase) {
+                                self.errorState = nil
+                            }
+                        }
+
+                    ConfirmationDialogView(
+                        title: errorState.title,
+                        message: errorState.message,
+                        primaryButtonTitle: "Okay",
+                        showsCancelButton: false,
+                        primaryAction: {
+                            withAnimation(LunaraAnimation.quickEase) {
+                                self.errorState = nil
+                            }
+                        },
+                        dismissAction: {
+                            withAnimation(LunaraAnimation.quickEase) {
+                                self.errorState = nil
+                            }
+                        }
+                    )
+                    .transition(.opacity.combined(with: .scale(scale: 0.96)))
+                }
+            }
+        }
+        .animation(LunaraAnimation.quickEase, value: errorState != nil)
         .sheet(isPresented: $showEditSheet) {
             NavigationStack {
                 EditDreamView(entry: entry)
@@ -212,17 +245,14 @@ private extension DreamDetailView {
 
         do {
             try modelContext.save()
-
             showDeleteDialog = false
             dismiss()
-
-            router.toastMessage = "Dream deleted"
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                router.toastMessage = nil
-            }
+            router.handleDreamDeleted()
         } catch {
-            print("Failed to delete dream: \(error)")
+            errorState = AppErrorState(
+                title: "Couldn’t Delete Dream",
+                message: "Something went wrong while deleting your dream. Please try again."
+            )
         }
     }
 }

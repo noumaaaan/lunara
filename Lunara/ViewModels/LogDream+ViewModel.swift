@@ -16,6 +16,8 @@ final class LogDreamViewModel: ObservableObject {
     @Published var selectedCategory: DreamCategory
     @Published var selectedIntensity: Int
     @Published var selectedMood: WakingMood
+    @Published var isSaving = false
+    @Published var errorState: AppErrorState?
 
     init(
         dreamDate: Date = Date(),
@@ -59,37 +61,65 @@ final class LogDreamViewModel: ObservableObject {
     var currentIntensity: DreamIntensity {
         DreamIntensity(rawValue: selectedIntensity) ?? .notSoIntense
     }
-
+    
     @discardableResult
     func saveDream(using modelContext: ModelContext) throws -> DreamEntry {
-        let entry = DreamEntry(
-            created: Date(),
-            modified: Date(),
-            dreamDate: dreamDate,
-            title: trimmedTitle,
-            content: trimmedContent,
-            category: selectedCategory,
-            intensity: selectedIntensity,
-            wakingMood: selectedMood
-        )
+        guard !isSaving else { throw SaveError.alreadySaving }
+        isSaving = true
+        defer { isSaving = false }
 
-        modelContext.insert(entry)
-        try modelContext.save()
-        reset()
+        do {
+            let entry = DreamEntry(
+                created: Date(),
+                modified: Date(),
+                dreamDate: dreamDate,
+                title: trimmedTitle,
+                content: trimmedContent,
+                category: selectedCategory,
+                intensity: selectedIntensity,
+                wakingMood: selectedMood
+            )
 
-        return entry
+            modelContext.insert(entry)
+            try modelContext.save()
+            reset()
+
+            return entry
+        } catch {
+            errorState = AppErrorState(
+                title: "Couldn’t Save Dream",
+                message: "Something went wrong while saving your dream. Please try again."
+            )
+            throw error
+        }
     }
-
+    
     func updateDream(_ entry: DreamEntry, using modelContext: ModelContext) throws {
-        entry.dreamDate = dreamDate
-        entry.title = trimmedTitle
-        entry.content = trimmedContent
-        entry.category = selectedCategory
-        entry.intensity = selectedIntensity
-        entry.wakingMood = selectedMood
-        entry.modified = Date()
+        guard !isSaving else { throw SaveError.alreadySaving }
+        isSaving = true
+        defer { isSaving = false }
 
-        try modelContext.save()
+        do {
+            entry.dreamDate = dreamDate
+            entry.title = trimmedTitle
+            entry.content = trimmedContent
+            entry.category = selectedCategory
+            entry.intensity = selectedIntensity
+            entry.wakingMood = selectedMood
+            entry.modified = Date()
+
+            try modelContext.save()
+        } catch {
+            errorState = AppErrorState(
+                title: "Couldn’t Update Dream",
+                message: "Something went wrong while updating your dream. Please try again."
+            )
+            throw error
+        }
+    }
+    
+    enum SaveError: Error {
+        case alreadySaving
     }
 
     func reset() {
@@ -99,5 +129,10 @@ final class LogDreamViewModel: ObservableObject {
         selectedCategory = .normal
         selectedIntensity = 2
         selectedMood = .neutral
+        errorState = nil
+    }
+    
+    func clearError() {
+        errorState = nil
     }
 }
