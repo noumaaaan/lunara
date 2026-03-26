@@ -22,13 +22,13 @@ struct WakingMoodSelectionView: View {
         VStack(alignment: .leading, spacing: .zero) {
             HStack(spacing: .zero) {
                 Text("How are you feeling now?")
-                    .font(LunaraFont.lightBodySmall)
+                    .font(LunaraFont.lightSmall)
                     .foregroundStyle(LunaraColor.cream.opacity(0.9))
 
                 Spacer()
                 
                 Text(selectedMood.displayName)
-                    .font(LunaraFont.semiBoldBody)
+                    .font(LunaraFont.semiBold)
                     .foregroundStyle(LunaraColor.cream)
             }
             .padding(.bottom, 10)
@@ -60,12 +60,12 @@ struct WakingMoodSelectionView: View {
 
     @ViewBuilder
     private func background(for mood: WakingMood) -> some View {
-        RoundedRectangle(cornerRadius: LunaraLayout.cornerRadius, style: .continuous)
+        RoundedRectangle(cornerRadius: LunaraRadius.regular, style: .continuous)
             .fill(mood == selectedMood ? mood.color : LunaraColor.secondary.opacity(0.35))
             .overlay {
-                RoundedRectangle(cornerRadius: LunaraLayout.cornerRadius, style: .continuous)
+                RoundedRectangle(cornerRadius: LunaraRadius.regular, style: .continuous)
                     .stroke(
-                        mood == selectedMood ? LunaraColor.focusedBorderColor : LunaraColor.borderColor,
+                        mood == selectedMood ? LunaraColor.focusedBorder : LunaraColor.border,
                         lineWidth: 1
                     )
             }

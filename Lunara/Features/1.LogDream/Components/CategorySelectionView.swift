@@ -22,13 +22,13 @@ struct CategorySelectionView: View {
         VStack(alignment: .leading, spacing: .zero) {
             HStack(spacing: .zero) {
                 Text("Dream Category")
-                    .font(LunaraFont.lightBodySmall)
+                    .font(LunaraFont.lightSmall)
                     .foregroundStyle(LunaraColor.cream.opacity(0.9))
 
                 Spacer()
                 
                 Text(selectedCategory.displayName)
-                    .font(LunaraFont.semiBoldBody)
+                    .font(LunaraFont.semiBold)
                     .foregroundStyle(LunaraColor.cream)
             }
             .padding(.bottom, 10)
@@ -60,12 +60,12 @@ struct CategorySelectionView: View {
 
     @ViewBuilder
     private func background(for category: DreamCategory) -> some View {
-        RoundedRectangle(cornerRadius: LunaraLayout.cornerRadius, style: .continuous)
+        RoundedRectangle(cornerRadius: LunaraRadius.regular, style: .continuous)
             .fill(category == selectedCategory ? category.color : LunaraColor.secondary.opacity(0.35))
             .overlay {
-                RoundedRectangle(cornerRadius: LunaraLayout.cornerRadius, style: .continuous)
+                RoundedRectangle(cornerRadius: LunaraRadius.regular, style: .continuous)
                     .stroke(
-                        category == selectedCategory ? LunaraColor.focusedBorderColor : LunaraColor.borderColor,
+                        category == selectedCategory ? LunaraColor.focusedBorder : LunaraColor.border,
                         lineWidth: 1
                     )
             }

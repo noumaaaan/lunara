@@ -61,11 +61,11 @@ struct JournalRowView: View {
             .padding(Constants.cardPadding)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(
-                RoundedRectangle(cornerRadius: LunaraLayout.cornerRadius, style: .continuous)
+                RoundedRectangle(cornerRadius: LunaraRadius.regular, style: .continuous)
                     .fill(LunaraColor.secondary)
                     .overlay {
-                        RoundedRectangle(cornerRadius: LunaraLayout.cornerRadius, style: .continuous)
-                            .stroke(LunaraColor.borderColor, lineWidth: 1)
+                        RoundedRectangle(cornerRadius: LunaraRadius.regular, style: .continuous)
+                            .stroke(LunaraColor.border, lineWidth: 1)
                     }
             )
         }

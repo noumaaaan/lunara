@@ -17,7 +17,7 @@ struct SaveHUDView: View {
                 .foregroundStyle(LunaraColor.cream)
 
             Text(message)
-                .font(LunaraFont.semiBoldBody)
+                .font(LunaraFont.semiBold)
                 .foregroundStyle(LunaraColor.cream)
         }
         .padding(.horizontal, 28)
@@ -27,7 +27,7 @@ struct SaveHUDView: View {
                 .fill(.ultraThinMaterial)
                 .overlay {
                     RoundedRectangle(cornerRadius: 24, style: .continuous)
-                        .stroke(LunaraColor.borderColor, lineWidth: 1)
+                        .stroke(LunaraColor.border, lineWidth: 1)
                 }
         )
         .shadow(color: Color.black.opacity(0.22), radius: 18, x: 0, y: 10)

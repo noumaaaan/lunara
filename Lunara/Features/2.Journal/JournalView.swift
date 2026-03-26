@@ -42,7 +42,7 @@ struct JournalView: View {
         }
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.visible, for: .navigationBar)
-        .toolbarBackground(LunaraColor.tabBarColor, for: .navigationBar)
+        .toolbarBackground(LunaraColor.tabBar, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .principal) {

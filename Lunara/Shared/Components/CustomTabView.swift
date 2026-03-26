@@ -46,7 +46,7 @@ struct CustomTabView: View {
                                 .fill(Constants.whiteReducedOpacity)
                                 .overlay {
                                     RoundedRectangle(cornerRadius: Constants.cornerRadius, style: .continuous)
-                                        .stroke(LunaraColor.borderColor, lineWidth: 1)
+                                        .stroke(LunaraColor.border, lineWidth: 1)
                             }
                             .frame(width: Constants.selectedPillWidth,height: Constants.selectedPillHeight)
                             .matchedGeometryEffect(id: "selectedTabBackground", in: namespace)
@@ -70,10 +70,10 @@ struct CustomTabView: View {
         .frame(height: Constants.hstackHeight)
         .background(
             RoundedRectangle(cornerRadius: Constants.cornerRadius, style: .continuous)
-                .fill(LunaraColor.tabBarColor)
+                .fill(LunaraColor.tabBar)
                 .overlay {
                     RoundedRectangle(cornerRadius: Constants.cornerRadius, style: .continuous)
-                        .stroke(LunaraColor.borderColor, lineWidth: 1)
+                        .stroke(LunaraColor.border, lineWidth: 1)
                 }
                 .shadow(color: Constants.tabShadowColor, radius: 20, x: 0, y: 10)
         )

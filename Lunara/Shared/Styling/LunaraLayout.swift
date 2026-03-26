@@ -7,8 +7,4 @@
 
 import Foundation
 
-enum LunaraLayout {
-    
-    static let cornerRadius: CGFloat = 15
-    
-}
+

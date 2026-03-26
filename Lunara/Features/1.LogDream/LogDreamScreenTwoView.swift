@@ -50,7 +50,7 @@ struct LogDreamScreenTwoView: View {
         }
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.visible, for: .navigationBar)
-        .toolbarBackground(LunaraColor.tabBarColor, for: .navigationBar)
+        .toolbarBackground(LunaraColor.tabBar, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .principal) {
@@ -80,13 +80,13 @@ private extension LogDreamScreenTwoView {
         do {
             let savedEntry = try viewModel.saveDream(using: modelContext)
 
-            router.savedDreamToastMessage = "Dream saved"
+            router.toastMessage = "Dream saved"
             router.pendingJournalEntryID = savedEntry.id
 
             dismiss()
 
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                router.savedDreamToastMessage = nil
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                router.toastMessage = nil
                 router.selectedTab = .journal
             }
         } catch {

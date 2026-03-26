@@ -1,10 +1,11 @@
 //
-//  LogDreamScreenOneView.swift
+//  EditDreamView.swift
 //  Lunara
 //
-//  Created by Noumaan Mehmood on 25/03/2026.
+//  Created by Noumaan Mehmood on 26/03/2026.
 //
 
+import Foundation
 import SwiftUI
 import SwiftData
 
@@ -12,17 +13,23 @@ private enum Constants {
     static let screenPadding: CGFloat = 16
     static let sectionSpacing: CGFloat = 20
     static let titleFieldHeight: CGFloat = 50
-    static let bottomContentPadding: CGFloat = 100
+    static let bottomContentPadding: CGFloat = 120
 }
 
-struct LogDreamScreenOneView: View {
+struct EditDreamView: View {
     @Environment(\.modelContext) private var modelContext
-    @EnvironmentObject private var router: AppRouter
+    @Environment(\.dismiss) private var dismiss
 
-    @StateObject private var viewModel = LogDreamViewModel()
+    let entry: DreamEntry
+
+    @StateObject private var viewModel: LogDreamViewModel
     @FocusState private var isDreamContentFocused: Bool
     @FocusState private var isTitleFocused: Bool
-    @State private var shouldNavigateToDetails = false
+
+    init(entry: DreamEntry) {
+        self.entry = entry
+        _viewModel = StateObject(wrappedValue: LogDreamViewModel(entry: entry))
+    }
 
     var body: some View {
         GeometryReader { proxy in
@@ -33,7 +40,24 @@ struct LogDreamScreenOneView: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: Constants.sectionSpacing) {
                         titleSection
-                        contentSection(editorMinHeight: proxy.size.height * 0.42)
+                        contentSection(editorMinHeight: proxy.size.height * 0.32)
+                        DateSelectionView(selectedDate: $viewModel.dreamDate)
+
+                        CategorySelectionView(
+                            selectedCategory: $viewModel.selectedCategory
+                        )
+
+                        DreamIntensityView(
+                            selectedIntensity: Binding(
+                                get: { viewModel.currentIntensity },
+                                set: { viewModel.selectedIntensity = $0.rawValue }
+                            )
+                        )
+
+                        WakingMoodSelectionView(
+                            selectedMood: $viewModel.selectedMood
+                        )
+
                         actionSection
                     }
                     .padding(Constants.screenPadding)
@@ -56,7 +80,7 @@ struct LogDreamScreenOneView: View {
         .toolbarColorScheme(.dark, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .principal) {
-                Text("Log Dream")
+                Text("Edit Dream")
                     .font(.manropeBold(size: 18))
                     .foregroundStyle(LunaraColor.cream)
             }
@@ -71,13 +95,10 @@ struct LogDreamScreenOneView: View {
                 .font(LunaraFont.body)
             }
         }
-        .navigationDestination(isPresented: $shouldNavigateToDetails) {
-            LogDreamScreenTwoView(viewModel: viewModel)
-        }
     }
 }
 
-private extension LogDreamScreenOneView {
+private extension EditDreamView {
     var titleSection: some View {
         CustomTextField(
             text: $viewModel.title,
@@ -89,7 +110,7 @@ private extension LogDreamScreenOneView {
 
     func contentSection(editorMinHeight: CGFloat) -> some View {
         VStack(alignment: .leading, spacing: .zero) {
-            Text("So, what happened?")
+            Text("What happened?")
                 .font(LunaraFont.lightSmall)
                 .foregroundStyle(LunaraColor.cream.opacity(0.9))
                 .padding(.bottom, 10)
@@ -103,50 +124,40 @@ private extension LogDreamScreenOneView {
     }
 
     var actionSection: some View {
-        VStack(spacing: 12) {
-            CustomButton(
-                title: "Next",
-                style: .primary,
-                height: 56,
-                isDisabled: viewModel.isSaveDisabled
-            ) {
-                shouldNavigateToDetails = true
-            }
-
-            CustomButton(
-                title: "Save for Now",
-                style: .secondary,
-                height: 50,
-                isDisabled: viewModel.isSaveDisabled
-            ) {
-                saveDream()
-            }
+        CustomButton(
+            title: "Save Changes",
+            style: .primary,
+            height: 56,
+            isDisabled: viewModel.isSaveDisabled
+        ) {
+            saveChanges()
         }
+        .padding(.top, 4)
     }
 
-    func saveDream() {
+    func saveChanges() {
         do {
-            let savedEntry = try viewModel.saveDream(using: modelContext)
-
+            try viewModel.updateDream(entry, using: modelContext)
             isDreamContentFocused = false
             isTitleFocused = false
-
-            router.toastMessage = "Dream saved"
-            router.pendingJournalEntryID = savedEntry.id
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                router.toastMessage = nil
-                router.selectedTab = .journal
-            }
+            dismiss()
         } catch {
-            print("Failed to save dream: \(error)")
+            print("Failed to update dream: \(error)")
         }
     }
 }
 
 #Preview {
     NavigationStack {
-        LogDreamScreenOneView()
-            .environmentObject(AppRouter())
+        EditDreamView(
+            entry: DreamEntry(
+                dreamDate: Date(),
+                title: "Flying over the city",
+                content: "I was flying over a glowing city and then suddenly I was back in school sitting an exam I had not revised for.",
+                category: .weird,
+                intensity: 4,
+                wakingMood: .anxious
+            )
+        )
     }
 }

@@ -43,14 +43,14 @@ struct CustomTextField: View {
         .padding(.horizontal, 16)
         .frame(height: height)
         .background(
-            RoundedRectangle(cornerRadius: LunaraLayout.cornerRadius, style: .continuous)
+            RoundedRectangle(cornerRadius: LunaraRadius.regular, style: .continuous)
                 .fill(LunaraColor.secondary)
                 .overlay {
-                    RoundedRectangle(cornerRadius: LunaraLayout.cornerRadius, style: .continuous)
+                    RoundedRectangle(cornerRadius: LunaraRadius.regular, style: .continuous)
                         .stroke(
                             isFocused?.wrappedValue == true
                             ? LunaraColor.cream.opacity(0.8)
-                            : LunaraColor.borderColor,
+                            : LunaraColor.border,
                             lineWidth: 1
                         )
                 }

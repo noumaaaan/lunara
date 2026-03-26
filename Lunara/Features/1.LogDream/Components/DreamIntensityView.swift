@@ -22,13 +22,13 @@ struct DreamIntensityView: View {
         VStack(alignment: .leading, spacing: .zero) {
             HStack(spacing: .zero) {
                 Text("How intense was it?")
-                    .font(LunaraFont.lightBodySmall)
+                    .font(LunaraFont.lightSmall)
                     .foregroundStyle(LunaraColor.cream.opacity(0.9))
 
                 Spacer()
 
                 Text(selectedIntensity.displayName)
-                    .font(LunaraFont.semiBoldBody)
+                    .font(LunaraFont.semiBold)
                     .foregroundStyle(LunaraColor.cream)
             }
             .padding(.bottom, 10)
@@ -41,7 +41,7 @@ struct DreamIntensityView: View {
                         }
                     } label: {
                         Text(String(intensity.rawValue))
-                            .font(LunaraFont.semiBoldBody)
+                            .font(LunaraFont.semiBold)
                             .foregroundStyle(foregroundColor(for: intensity))
                             .frame(maxWidth: .infinity)
                             .frame(height: Constants.itemHeight)
@@ -61,12 +61,12 @@ struct DreamIntensityView: View {
 
     @ViewBuilder
     private func background(for intensity: DreamIntensity) -> some View {
-        RoundedRectangle(cornerRadius: LunaraLayout.cornerRadius, style: .continuous)
+        RoundedRectangle(cornerRadius: LunaraRadius.regular, style: .continuous)
             .fill(intensity == selectedIntensity ? intensity.color : LunaraColor.secondary.opacity(0.35))
             .overlay {
-                RoundedRectangle(cornerRadius: LunaraLayout.cornerRadius, style: .continuous)
+                RoundedRectangle(cornerRadius: LunaraRadius.regular, style: .continuous)
                     .stroke(
-                        intensity == selectedIntensity ? LunaraColor.focusedBorderColor : LunaraColor.borderColor,
+                        intensity == selectedIntensity ? LunaraColor.focusedBorder : LunaraColor.border,
                         lineWidth: 1
                     )
             }

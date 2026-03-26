@@ -34,8 +34,8 @@ struct CustomTextEditorView: View {
                     RoundedRectangle(cornerRadius: Constants.cornerRadius, style: .continuous)
                         .stroke(
                             isFocused.wrappedValue
-                            ? LunaraColor.focusedBorderColor
-                            : LunaraColor.borderColor,
+                            ? LunaraColor.focusedBorder
+                            : LunaraColor.border,
                             lineWidth: 1
                         )
                 }

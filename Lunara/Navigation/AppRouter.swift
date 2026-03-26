@@ -11,6 +11,6 @@ import SwiftUI
 
 final class AppRouter: ObservableObject {
     @Published var selectedTab: TabOption = .log
-    @Published var savedDreamToastMessage: String?
+    @Published var toastMessage: String?
     @Published var pendingJournalEntryID: UUID?
 }

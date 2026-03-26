@@ -46,10 +46,10 @@ struct AppTabView: View {
             .environmentObject(router)
 
             CustomTabView(selectedTab: $router.selectedTab)
-                .opacity(router.savedDreamToastMessage == nil ? 1 : 0)
+                .opacity(router.toastMessage == nil ? 1 : 0)
         }
         .overlay {
-            if let message = router.savedDreamToastMessage {
+            if let message = router.toastMessage {
                 ZStack {
                     Color.black.opacity(0.37)
                         .ignoresSafeArea()
@@ -59,30 +59,10 @@ struct AppTabView: View {
                 }
             }
         }
-        .animation(.easeInOut(duration: 0.2), value: router.savedDreamToastMessage)
+        .animation(.easeInOut(duration: 0.2), value: router.toastMessage)
     }
 }
 
 #Preview {
     AppTabView()
-}
-
-import SwiftUI
-import Combine
-
-final class KeyboardObserver: ObservableObject {
-    @Published var isKeyboardVisible = false
-
-    private var cancellables = Set<AnyCancellable>()
-
-    init() {
-        NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)
-            .map { _ in true }
-            .merge(
-                with: NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)
-                    .map { _ in false }
-            )
-            .receive(on: RunLoop.main)
-            .assign(to: &$isKeyboardVisible)
-    }
 }

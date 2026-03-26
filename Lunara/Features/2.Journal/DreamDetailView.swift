@@ -15,11 +15,13 @@ private enum Constants {
 
 struct DreamDetailView: View {
     @Environment(\.modelContext) private var modelContext
+    @EnvironmentObject private var router: AppRouter
     @Environment(\.dismiss) private var dismiss
 
     let entry: DreamEntry
 
     @State private var showDeleteDialog = false
+    @State private var showEditSheet = false
 
     var body: some View {
         ZStack {
@@ -42,7 +44,7 @@ struct DreamDetailView: View {
                     Color.black.opacity(0.37)
                         .ignoresSafeArea()
                         .onTapGesture {
-                            withAnimation(.easeInOut(duration: 0.2)) {
+                            withAnimation(LunaraAnimation.quickEase) {
                                 showDeleteDialog = false
                             }
                         }
@@ -54,7 +56,7 @@ struct DreamDetailView: View {
                         showsCancelButton: true,
                         primaryAction: deleteDream,
                         dismissAction: {
-                            withAnimation(.easeInOut(duration: 0.2)) {
+                            withAnimation(LunaraAnimation.quickEase) {
                                 showDeleteDialog = false
                             }
                         }
@@ -65,7 +67,7 @@ struct DreamDetailView: View {
         }
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.visible, for: .navigationBar)
-        .toolbarBackground(LunaraColor.tabBarColor, for: .navigationBar)
+        .toolbarBackground(LunaraColor.tabBar, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .principal) {
@@ -74,9 +76,16 @@ struct DreamDetailView: View {
                     .foregroundStyle(LunaraColor.cream)
             }
 
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItemGroup(placement: .topBarTrailing) {
                 Button {
-                    withAnimation(.easeInOut(duration: 0.2)) {
+                    showEditSheet = true
+                } label: {
+                    Image("edit")
+                        .foregroundStyle(LunaraColor.cream)
+                }
+
+                Button {
+                    withAnimation(LunaraAnimation.quickEase) {
                         showDeleteDialog = true
                     }
                 } label: {
@@ -85,7 +94,13 @@ struct DreamDetailView: View {
                 }
             }
         }
-        .animation(.easeInOut(duration: 0.2), value: showDeleteDialog)
+        .sheet(isPresented: $showEditSheet) {
+            NavigationStack {
+                EditDreamView(entry: entry)
+            }
+            .presentationDragIndicator(.visible)
+        }
+        .animation(LunaraAnimation.quickEase, value: showDeleteDialog)
     }
 }
 
@@ -117,14 +132,14 @@ private extension DreamDetailView {
                 .multilineTextAlignment(.leading)
                 .lineSpacing(4)
         }
-        .padding(15)
+        .padding(LunaraPadding.screen)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
-            RoundedRectangle(cornerRadius: LunaraLayout.cornerRadius, style: .continuous)
+            RoundedRectangle(cornerRadius: LunaraRadius.regular, style: .continuous)
                 .fill(LunaraColor.secondary)
                 .overlay {
-                    RoundedRectangle(cornerRadius: LunaraLayout.cornerRadius, style: .continuous)
-                        .stroke(LunaraColor.borderColor, lineWidth: 1)
+                    RoundedRectangle(cornerRadius: LunaraRadius.regular, style: .continuous)
+                        .stroke(LunaraColor.border, lineWidth: 1)
                 }
         )
     }
@@ -146,14 +161,14 @@ private extension DreamDetailView {
                 value: entry.modified.formatted(date: .abbreviated, time: .shortened)
             )
         }
-        .padding(15)
+        .padding(LunaraPadding.screen)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
-            RoundedRectangle(cornerRadius: LunaraLayout.cornerRadius, style: .continuous)
+            RoundedRectangle(cornerRadius: LunaraRadius.regular, style: .continuous)
                 .fill(LunaraColor.secondary)
                 .overlay {
-                    RoundedRectangle(cornerRadius: LunaraLayout.cornerRadius, style: .continuous)
-                        .stroke(LunaraColor.borderColor, lineWidth: 1)
+                    RoundedRectangle(cornerRadius: LunaraRadius.regular, style: .continuous)
+                        .stroke(LunaraColor.border, lineWidth: 1)
                 }
         )
     }
@@ -197,12 +212,18 @@ private extension DreamDetailView {
 
         do {
             try modelContext.save()
+
+            showDeleteDialog = false
+            dismiss()
+
+            router.toastMessage = "Dream deleted"
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                router.toastMessage = nil
+            }
         } catch {
             print("Failed to delete dream: \(error)")
         }
-
-        showDeleteDialog = false
-        dismiss()
     }
 }
 

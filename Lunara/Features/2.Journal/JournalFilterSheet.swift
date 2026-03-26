@@ -39,14 +39,14 @@ struct JournalFilterSheet: View {
                         }
 
                         Divider()
-                            .overlay(LunaraColor.borderColor)
+                            .overlay(LunaraColor.border)
 
                         section("Waking Mood") {
                             moodSelection(columns: moodColumns)
                         }
 
                         Divider()
-                            .overlay(LunaraColor.borderColor)
+                            .overlay(LunaraColor.border)
 
                         section("Intensity") {
                             intensitySelection(columns: intensityColumns)
@@ -59,7 +59,7 @@ struct JournalFilterSheet: View {
             }
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.visible, for: .navigationBar)
-            .toolbarBackground(LunaraColor.tabBarColor, for: .navigationBar)
+            .toolbarBackground(LunaraColor.tabBar, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .principal) {
@@ -116,12 +116,12 @@ private extension JournalFilterSheet {
                         .frame(maxWidth: .infinity)
                         .frame(height: 50)
                         .background(
-                            RoundedRectangle(cornerRadius: LunaraLayout.cornerRadius, style: .continuous)
+                            RoundedRectangle(cornerRadius: LunaraRadius.regular, style: .continuous)
                                 .fill(isSelected ? category.color : LunaraColor.secondary.opacity(0.35))
                                 .overlay {
-                                    RoundedRectangle(cornerRadius: LunaraLayout.cornerRadius, style: .continuous)
+                                    RoundedRectangle(cornerRadius: LunaraRadius.regular, style: .continuous)
                                         .stroke(
-                                            isSelected ? LunaraColor.focusedBorderColor : LunaraColor.borderColor,
+                                            isSelected ? LunaraColor.focusedBorder : LunaraColor.border,
                                             lineWidth: 1
                                         )
                                 }
@@ -148,12 +148,12 @@ private extension JournalFilterSheet {
                         .frame(maxWidth: .infinity)
                         .frame(height: 50)
                         .background(
-                            RoundedRectangle(cornerRadius: LunaraLayout.cornerRadius, style: .continuous)
+                            RoundedRectangle(cornerRadius: LunaraRadius.regular, style: .continuous)
                                 .fill(isSelected ? mood.color : LunaraColor.secondary.opacity(0.35))
                                 .overlay {
-                                    RoundedRectangle(cornerRadius: LunaraLayout.cornerRadius, style: .continuous)
+                                    RoundedRectangle(cornerRadius: LunaraRadius.regular, style: .continuous)
                                         .stroke(
-                                            isSelected ? LunaraColor.focusedBorderColor : LunaraColor.borderColor,
+                                            isSelected ? LunaraColor.focusedBorder : LunaraColor.border,
                                             lineWidth: 1
                                         )
                                 }
@@ -182,12 +182,12 @@ private extension JournalFilterSheet {
                         .frame(maxWidth: .infinity)
                         .frame(height: 50)
                         .background(
-                            RoundedRectangle(cornerRadius: LunaraLayout.cornerRadius, style: .continuous)
+                            RoundedRectangle(cornerRadius: LunaraRadius.regular, style: .continuous)
                                 .fill(isSelected ? intensity.color : LunaraColor.secondary.opacity(0.35))
                                 .overlay {
-                                    RoundedRectangle(cornerRadius: LunaraLayout.cornerRadius, style: .continuous)
+                                    RoundedRectangle(cornerRadius: LunaraRadius.regular, style: .continuous)
                                         .stroke(
-                                            isSelected ? LunaraColor.focusedBorderColor : LunaraColor.borderColor,
+                                            isSelected ? LunaraColor.focusedBorder : LunaraColor.border,
                                             lineWidth: 1
                                         )
                                 }

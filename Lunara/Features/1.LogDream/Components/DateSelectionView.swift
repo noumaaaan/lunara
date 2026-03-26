@@ -17,7 +17,7 @@ struct DateSelectionView: View {
     var body: some View {
         HStack(spacing: .zero) {
             Text("Dream Date")
-                .font(LunaraFont.lightBodySmall)
+                .font(LunaraFont.lightSmall)
                 .foregroundStyle(LunaraColor.cream.opacity(0.9))
 
             Spacer()

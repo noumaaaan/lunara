@@ -56,10 +56,6 @@ final class LogDreamViewModel: ObservableObject {
         trimmedContent.isEmpty
     }
 
-    var formattedDreamDate: String {
-        dreamDate.formatted(.dateTime.weekday(.wide).day().month(.wide).year())
-    }
-
     var currentIntensity: DreamIntensity {
         DreamIntensity(rawValue: selectedIntensity) ?? .notSoIntense
     }
@@ -82,6 +78,18 @@ final class LogDreamViewModel: ObservableObject {
         reset()
 
         return entry
+    }
+
+    func updateDream(_ entry: DreamEntry, using modelContext: ModelContext) throws {
+        entry.dreamDate = dreamDate
+        entry.title = trimmedTitle
+        entry.content = trimmedContent
+        entry.category = selectedCategory
+        entry.intensity = selectedIntensity
+        entry.wakingMood = selectedMood
+        entry.modified = Date()
+
+        try modelContext.save()
     }
 
     func reset() {

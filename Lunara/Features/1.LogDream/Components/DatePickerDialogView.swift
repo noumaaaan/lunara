@@ -36,7 +36,7 @@ struct DatePickerDialogView: View {
             Text(
                 draftDate.formatted(.dateTime.weekday(.wide).day().month(.wide).year())
             )
-            .font(LunaraFont.semiBoldBody)
+            .font(LunaraFont.semiBold)
             .foregroundStyle(LunaraColor.cream)
             .frame(maxWidth: .infinity, alignment: .center)
 
@@ -57,7 +57,7 @@ struct DatePickerDialogView: View {
                     .fill(LunaraColor.background.opacity(0.35))
                     .overlay {
                         RoundedRectangle(cornerRadius: Constants.calendarCornerRadius, style: .continuous)
-                            .stroke(LunaraColor.borderColor, lineWidth: 1)
+                            .stroke(LunaraColor.border, lineWidth: 1)
                     }
             )
 
@@ -89,7 +89,7 @@ struct DatePickerDialogView: View {
                 .fill(LunaraColor.secondary)
                 .overlay {
                     RoundedRectangle(cornerRadius: Constants.containerCornerRadius, style: .continuous)
-                        .stroke(LunaraColor.borderColor, lineWidth: 1)
+                        .stroke(LunaraColor.border, lineWidth: 1)
                 }
         )
         .shadow(color: Color.black.opacity(0.28), radius: 20, x: 0, y: 12)

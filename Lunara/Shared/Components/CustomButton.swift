@@ -51,7 +51,7 @@ struct CustomButton: View {
     private var titleFont: Font {
         switch style {
         case .primary:
-            return LunaraFont.boldBody
+            return LunaraFont.bold
         case .secondary:
             return LunaraFont.body
         }
@@ -70,15 +70,15 @@ struct CustomButton: View {
     private var backgroundView: some View {
         switch style {
         case .primary:
-            RoundedRectangle(cornerRadius: LunaraLayout.cornerRadius, style: .continuous)
+            RoundedRectangle(cornerRadius: LunaraRadius.regular, style: .continuous)
                 .fill(LunaraColor.cream)
 
         case .secondary:
-            RoundedRectangle(cornerRadius: LunaraLayout.cornerRadius, style: .continuous)
+            RoundedRectangle(cornerRadius: LunaraRadius.regular, style: .continuous)
                 .fill(LunaraColor.secondary)
                 .overlay {
-                    RoundedRectangle(cornerRadius: LunaraLayout.cornerRadius, style: .continuous)
-                        .stroke(LunaraColor.borderColor, lineWidth: 1)
+                    RoundedRectangle(cornerRadius: LunaraRadius.regular, style: .continuous)
+                        .stroke(LunaraColor.border, lineWidth: 1)
                 }
         }
     }

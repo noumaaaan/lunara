@@ -65,7 +65,7 @@ struct CustomDialogContainer<Content: View>: View {
                 .fill(LunaraColor.secondary)
                 .overlay {
                     RoundedRectangle(cornerRadius: 24, style: .continuous)
-                        .stroke(LunaraColor.borderColor, lineWidth: 1)
+                        .stroke(LunaraColor.border, lineWidth: 1)
                 }
         )
         .shadow(color: Color.black.opacity(0.28), radius: 20, x: 0, y: 12)
