@@ -9,8 +9,10 @@ import SwiftUI
 
 private enum Constants {
     static let screenPadding: CGFloat = 16
-    static let sectionSpacing: CGFloat = 18
+    static let sectionSpacing: CGFloat = 22
     static let gridSpacing: CGFloat = 8
+    static let actionAreaTopPadding: CGFloat = 12
+    static let bottomPadding: CGFloat = 24
 }
 
 struct JournalFilterSheet: View {
@@ -32,30 +34,61 @@ struct JournalFilterSheet: View {
                 LunaraColor.background
                     .ignoresSafeArea()
 
-                ScrollView {
-                    VStack(alignment: .leading, spacing: Constants.sectionSpacing) {
-                        section("Category") {
-                            categorySelection(columns: categoryColumns)
+                VStack(spacing: 0) {
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: Constants.sectionSpacing) {
+                            section("Category") {
+                                categorySelection(columns: categoryColumns)
+                            }
+
+                            Divider()
+                                .overlay(LunaraColor.border)
+
+                            section("Waking Mood") {
+                                moodSelection(columns: moodColumns)
+                            }
+
+                            Divider()
+                                .overlay(LunaraColor.border)
+
+                            section("Intensity") {
+                                intensitySelection(columns: intensityColumns)
+                            }
+                        }
+                        .padding(Constants.screenPadding)
+                        .padding(.bottom, 12)
+                    }
+                    .scrollIndicators(.hidden)
+
+                    VStack(spacing: 10) {
+                        CustomButton(
+                            title: "Done",
+                            style: .primary,
+                            height: 50
+                        ) {
+                            dismiss()
                         }
 
-                        Divider()
-                            .overlay(LunaraColor.border)
-
-                        section("Waking Mood") {
-                            moodSelection(columns: moodColumns)
-                        }
-
-                        Divider()
-                            .overlay(LunaraColor.border)
-
-                        section("Intensity") {
-                            intensitySelection(columns: intensityColumns)
+                        CustomButton(
+                            title: "Reset Filters",
+                            style: .secondary,
+                            height: 46
+                        ) {
+                            resetAction()
                         }
                     }
-                    .padding(Constants.screenPadding)
-                    .padding(.bottom, 30)
+                    .padding(.horizontal, Constants.screenPadding)
+                    .padding(.top, Constants.actionAreaTopPadding)
+                    .padding(.bottom, Constants.bottomPadding)
+                    .background(
+                        Rectangle()
+                            .fill(LunaraColor.background.opacity(0.96))
+                            .overlay(alignment: .top) {
+                                Divider()
+                                    .overlay(LunaraColor.border)
+                            }
+                    )
                 }
-                .scrollIndicators(.hidden)
             }
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.visible, for: .navigationBar)
@@ -66,22 +99,6 @@ struct JournalFilterSheet: View {
                     Text("Filters")
                         .font(.manropeBold(size: 18))
                         .foregroundStyle(LunaraColor.cream)
-                }
-
-                ToolbarItem(placement: .topBarLeading) {
-                    Button("Reset") {
-                        resetAction()
-                    }
-                    .font(LunaraFont.body)
-                    .foregroundStyle(LunaraColor.cream.opacity(0.8))
-                }
-
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") {
-                        dismiss()
-                    }
-                    .font(LunaraFont.body)
-                    .foregroundStyle(LunaraColor.cream)
                 }
             }
         }

@@ -63,6 +63,7 @@ enum LunaraFont {
 enum LunaraAnimation {
     
     static let quickEase = Animation.easeInOut(duration: 0.2)
+    static let gentleEase = Animation.easeInOut(duration: 0.32)
     static let standardSpring = Animation.spring(response: 0.28, dampingFraction: 0.75)
     static let softSpring = Animation.spring(response: 0.3, dampingFraction: 0.82)
 }

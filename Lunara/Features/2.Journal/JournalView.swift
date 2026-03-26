@@ -50,28 +50,26 @@ struct JournalView: View {
                     .font(.manropeBold(size: 18))
                     .foregroundStyle(LunaraColor.cream)
             }
-
             ToolbarItem(placement: .topBarLeading) {
-                Menu {
-                    ForEach(JournalSortOption.allCases, id: \.self) { option in
-                        Button {
-                            withAnimation(.easeInOut(duration: 0.2)) {
-                                selectedSortOption = option
-                            }
-                        } label: {
-                            if selectedSortOption == option {
-                                Label(option.displayName, systemImage: "checkmark")
-                            } else {
-                                Text(option.displayName)
-                            }
-                        }
+                Button {
+                    withAnimation(LunaraAnimation.gentleEase) {
+                        selectedSortOption = selectedSortOption == .newestFirst
+                            ? .oldestFirst
+                            : .newestFirst
                     }
                 } label: {
-                    Image("sort")
+                    Image(selectedSortOption == .newestFirst ? "arrowDown" : "arrowUp")
                         .foregroundStyle(LunaraColor.cream)
+                        .transition(
+                            .asymmetric(
+                                insertion: .scale(scale: 0.9).combined(with: .opacity),
+                                removal: .scale(scale: 1.1).combined(with: .opacity)
+                            )
+                        )
                 }
+                .disabled(displayedDreamEntries.isEmpty)
+                .opacity(displayedDreamEntries.isEmpty ? 0.45 : 1)
             }
-
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
                     showFilterSheet = true
@@ -181,26 +179,44 @@ private extension JournalView {
     }
 
     var journalEmptyState: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 14) {
+            Image(systemName: "moon.stars")
+                .font(.system(size: 26, weight: .regular))
+                .foregroundStyle(LunaraColor.cream.opacity(0.85))
+
             Text("No dreams logged yet")
-                .font(.manropeSemiBold(size: 18))
+                .font(LunaraFont.semiBold)
                 .foregroundStyle(LunaraColor.cream)
 
-            Text("Start logging your dreams and they’ll appear here in your journal.")
+            Text("Your saved dreams will appear here once you start logging them.")
                 .font(LunaraFont.body)
                 .foregroundStyle(LunaraColor.cream.opacity(0.75))
                 .multilineTextAlignment(.center)
         }
-        .padding(.horizontal, 24)
+        .padding(24)
+        .frame(maxWidth: .infinity)
+        .background(
+            RoundedRectangle(cornerRadius: LunaraRadius.bigger, style: .continuous)
+                .fill(LunaraColor.secondary.opacity(0.7))
+                .overlay {
+                    RoundedRectangle(cornerRadius: LunaraRadius.bigger, style: .continuous)
+                        .stroke(LunaraColor.border, lineWidth: 1)
+                }
+        )
+        .padding(.horizontal, 8)
     }
 
     var filteredEmptyState: some View {
-        VStack(spacing: 12) {
-            Text("Nothing found")
-                .font(.manropeSemiBold(size: 18))
+        VStack(spacing: 14) {
+            Image(systemName: "line.3.horizontal.decrease.circle")
+                .font(.system(size: 24, weight: .regular))
+                .foregroundStyle(LunaraColor.cream.opacity(0.85))
+
+            Text("No matching dreams")
+                .font(LunaraFont.semiBold)
                 .foregroundStyle(LunaraColor.cream)
 
-            Text("No dreams match the current filters.")
+            Text("Try adjusting or clearing your filters to see more entries.")
                 .font(LunaraFont.body)
                 .foregroundStyle(LunaraColor.cream.opacity(0.75))
                 .multilineTextAlignment(.center)
@@ -214,15 +230,36 @@ private extension JournalView {
             }
             .padding(.top, 4)
         }
-        .padding(.horizontal, 24)
+        .padding(24)
+        .frame(maxWidth: .infinity)
+        .background(
+            RoundedRectangle(cornerRadius: LunaraRadius.bigger, style: .continuous)
+                .fill(LunaraColor.secondary.opacity(0.7))
+                .overlay {
+                    RoundedRectangle(cornerRadius: LunaraRadius.bigger, style: .continuous)
+                        .stroke(LunaraColor.border, lineWidth: 1)
+                }
+        )
+        .padding(.horizontal, 8)
     }
 
     func handlePendingSavedDream() {
         guard let pendingID = router.pendingJournalEntryID else { return }
-        guard let matchingEntry = allDreamEntries.first(where: { $0.id == pendingID }) else { return }
 
-        selectedEntry = matchingEntry
-        router.pendingJournalEntryID = nil
+        if let matchingEntry = allDreamEntries.first(where: { $0.id == pendingID }) {
+            selectedEntry = matchingEntry
+            router.pendingJournalEntryID = nil
+            return
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+            guard router.pendingJournalEntryID == pendingID else { return }
+
+            if let matchingEntry = allDreamEntries.first(where: { $0.id == pendingID }) {
+                selectedEntry = matchingEntry
+                router.pendingJournalEntryID = nil
+            }
+        }
     }
 }
 
