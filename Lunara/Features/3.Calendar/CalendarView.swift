@@ -60,8 +60,8 @@ struct CalendarView: View {
                     goToToday()
                 }
                 .font(LunaraFont.semiBoldSmall)
-                .foregroundStyle(isViewingCurrentMonth ? LunaraColor.cream.opacity(0.45) : LunaraColor.cream)
-                .disabled(isViewingCurrentMonth)
+                .foregroundStyle(shouldDisableTodayButton ? LunaraColor.cream.opacity(0.45) : LunaraColor.cream)
+                .disabled(shouldDisableTodayButton)
             }
         }
     }
@@ -183,10 +183,9 @@ private extension CalendarView {
     }
 
     func goToToday() {
-        let today = calendar.startOfDay(for: Date())
-
         withAnimation(LunaraAnimation.quickEase) {
-            selectedDate = today
+            selectedDate = todayDate
+            visibleMonthDate = todayDate
         }
 
         scrollToDateTrigger += 1
@@ -430,6 +429,20 @@ private struct CalendarDayItemView: View {
 
     private var borderWidth: CGFloat {
         isToday && !isSelected && !isFuture ? 1 : 0
+    }
+}
+
+private extension CalendarView {
+    var todayDate: Date {
+        calendar.startOfDay(for: Date())
+    }
+
+    var isTodaySelected: Bool {
+        calendar.isDate(selectedDate, inSameDayAs: todayDate)
+    }
+
+    var shouldDisableTodayButton: Bool {
+        isTodaySelected && isViewingCurrentMonth
     }
 }
 

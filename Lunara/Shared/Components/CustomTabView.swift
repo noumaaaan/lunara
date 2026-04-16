@@ -21,7 +21,7 @@ private enum Constants {
     static let tabShadowColor = LunaraColor.background.opacity(0.3)
     static let whiteReducedOpacity = LunaraColor.cream.opacity(0.1)
     static let selectedIconColor = LunaraColor.cream
-    static let iconColor = LunaraColor.pink.opacity(0.45)
+    static let iconColor = LunaraColor.pink.opacity(0.5)
     
     // Animation.
     static let selectionSpring = Animation.spring(response: 0.5, dampingFraction: 0.9)
@@ -57,7 +57,7 @@ struct CustomTabView: View {
                             .scaledToFit()
                             .frame(width: Constants.iconSize, height: Constants.iconSize)
                             .foregroundStyle(tab == selectedTab ? Constants.selectedIconColor : Constants.iconColor)
-                            .scaleEffect(tab == selectedTab ? 1.2 : 1)
+                            .scaleEffect(tab == selectedTab ? 1.3 : 1)
                     }
                     .frame(maxWidth: .infinity)
                     .frame(height: Constants.tabButtonHeight)

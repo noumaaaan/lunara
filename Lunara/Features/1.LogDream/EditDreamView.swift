@@ -79,6 +79,14 @@ struct EditDreamView: View {
         .toolbarBackground(LunaraColor.tabBar, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button("Cancel") {
+                    dismiss()
+                }
+                .font(LunaraFont.body)
+                .foregroundStyle(LunaraColor.cream)
+            }
+
             ToolbarItem(placement: .principal) {
                 Text("Edit Dream")
                     .font(.manropeBold(size: 18))

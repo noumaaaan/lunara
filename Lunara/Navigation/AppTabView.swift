@@ -49,6 +49,7 @@ struct AppTabView: View {
                 .opacity(router.toastMessage == nil ? 1 : 0)
                 .ignoresSafeArea(.keyboard, edges: .bottom)
         }
+        .ignoresSafeArea(.keyboard, edges: .bottom)
         .overlay {
             if let message = router.toastMessage {
                 ZStack {
