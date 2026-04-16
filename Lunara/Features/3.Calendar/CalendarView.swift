@@ -11,18 +11,25 @@ import HorizonCalendar
 
 private enum Constants {
     static let calendarHorizontalPadding: CGFloat = 16
-    static let calendarTopPadding: CGFloat = 12
-    static let calendarCardHeight: CGFloat = 410
+    static let calendarTopPadding: CGFloat = 18
+    static let calendarCardHeight: CGFloat = 440
     static let calendarInnerPadding: CGFloat = 14
+    static let monthHeaderBottomPadding: CGFloat = 16
+    static let monthHeaderTopPadding: CGFloat = 8
     static let sectionSpacing: CGFloat = 14
     static let bottomListPadding: CGFloat = 120
-    static let dividerTopPadding: CGFloat = 14
+    static let dividerTopPadding: CGFloat = 18
+    static let selectedDateTopPadding: CGFloat = 10
+    static let selectedDateBottomPadding: CGFloat = 10
+    static let entriesTopPadding: CGFloat = 18
 }
 
 struct CalendarView: View {
     @Query private var allDreamEntries: [DreamEntry]
 
     @State private var selectedDate: Date = Calendar.current.startOfDay(for: Date())
+    @State private var scrollToDateTrigger: Int = 0
+    @State private var visibleMonthDate: Date = Calendar.current.startOfDay(for: Date())
 
     private let calendar = Calendar.current
 
@@ -44,8 +51,17 @@ struct CalendarView: View {
         .toolbar {
             ToolbarItem(placement: .principal) {
                 Text("Calendar")
-                    .font(LunaraFont.bold)
+                    .font(.manropeBold(size: 18))
                     .foregroundStyle(LunaraColor.cream)
+            }
+
+            ToolbarItem(placement: .topBarTrailing) {
+                Button("Today") {
+                    goToToday()
+                }
+                .font(LunaraFont.semiBoldSmall)
+                .foregroundStyle(isViewingCurrentMonth ? LunaraColor.cream.opacity(0.45) : LunaraColor.cream)
+                .disabled(isViewingCurrentMonth)
             }
         }
     }
@@ -60,10 +76,15 @@ private extension CalendarView {
                 selectedDate: selectedDate,
                 dreamDates: dreamDatesForLookup,
                 initialMonthDate: firstDayOfCurrentMonth,
+                scrollToDate: calendar.startOfDay(for: Date()),
+                scrollToDateTrigger: scrollToDateTrigger,
                 onDayTapped: { tappedDate in
                     withAnimation(LunaraAnimation.gentleEase) {
                         selectedDate = tappedDate
                     }
+                },
+                onVisibleMonthChanged: { monthDate in
+                    visibleMonthDate = monthDate
                 }
             )
             .frame(height: Constants.calendarCardHeight)
@@ -74,7 +95,7 @@ private extension CalendarView {
     }
 
     var selectedDateSection: some View {
-        VStack(spacing: 10) {
+        VStack(spacing: 0) {
             Divider()
                 .overlay(LunaraColor.border.opacity(0.9))
                 .padding(.horizontal, Constants.calendarHorizontalPadding)
@@ -85,7 +106,8 @@ private extension CalendarView {
                 .foregroundStyle(LunaraColor.cream)
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: .infinity)
-                .padding(.top, 6)
+                .padding(.top, Constants.selectedDateTopPadding)
+                .padding(.bottom, Constants.selectedDateBottomPadding)
         }
     }
 
@@ -113,7 +135,7 @@ private extension CalendarView {
                     }
             )
             .padding(.horizontal, LunaraPadding.screen)
-            .padding(.top, Constants.sectionSpacing)
+            .padding(.top, Constants.entriesTopPadding)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         } else {
             ScrollView {
@@ -122,13 +144,13 @@ private extension CalendarView {
                         NavigationLink {
                             DreamDetailView(entry: entry)
                         } label: {
-                            JournalRowView(entry: entry)
+                            CalendarRowView(entry: entry)
                         }
                         .buttonStyle(.plain)
                     }
                 }
                 .padding(.horizontal, LunaraPadding.screen)
-                .padding(.top, Constants.sectionSpacing)
+                .padding(.top, Constants.entriesTopPadding)
                 .padding(.bottom, Constants.bottomListPadding)
             }
             .scrollIndicators(.hidden)
@@ -155,6 +177,20 @@ private extension CalendarView {
             .filter { calendar.isDate($0.dreamDate, inSameDayAs: selectedDate) }
             .sorted { $0.created > $1.created }
     }
+
+    var isViewingCurrentMonth: Bool {
+        calendar.isDate(visibleMonthDate, equalTo: Date(), toGranularity: .month)
+    }
+
+    func goToToday() {
+        let today = calendar.startOfDay(for: Date())
+
+        withAnimation(LunaraAnimation.quickEase) {
+            selectedDate = today
+        }
+
+        scrollToDateTrigger += 1
+    }
 }
 
 // MARK: - Horizon Calendar Wrapper
@@ -165,7 +201,10 @@ private struct HorizonCalendarContainerView: UIViewRepresentable {
     let selectedDate: Date
     let dreamDates: Set<Date>
     let initialMonthDate: Date
+    let scrollToDate: Date
+    let scrollToDateTrigger: Int
     let onDayTapped: (Date) -> Void
+    let onVisibleMonthChanged: (Date) -> Void
 
     func makeCoordinator() -> Coordinator {
         Coordinator()
@@ -174,14 +213,8 @@ private struct HorizonCalendarContainerView: UIViewRepresentable {
     func makeUIView(context: Context) -> HorizonCalendar.CalendarView {
         let view = HorizonCalendar.CalendarView(initialContent: makeContent())
         view.backgroundColor = .clear
-
-        view.daySelectionHandler = { day in
-            guard let tappedDate = calendar.date(from: day.components) else { return }
-            let normalized = calendar.startOfDay(for: tappedDate)
-
-            guard normalized <= calendar.startOfDay(for: Date()) else { return }
-            onDayTapped(normalized)
-        }
+        configureSelectionHandler(for: view)
+        configureScrollHandler(for: view)
 
         DispatchQueue.main.async {
             guard !context.coordinator.didScrollToInitialMonth else { return }
@@ -190,23 +223,73 @@ private struct HorizonCalendarContainerView: UIViewRepresentable {
             view.scroll(
                 toMonthContaining: initialMonthDate,
                 scrollPosition: .centered,
-                animated: false)
+                animated: false
+            )
+
+            notifyVisibleMonthIfNeeded(from: view, coordinator: context.coordinator)
         }
 
         return view
     }
 
     func updateUIView(_ uiView: HorizonCalendar.CalendarView, context: Context) {
-        uiView.daySelectionHandler = { day in
+        configureSelectionHandler(for: uiView)
+        configureScrollHandler(for: uiView)
+        uiView.backgroundColor = .clear
+        uiView.setContent(makeContent())
+
+        if context.coordinator.lastScrollToDateTrigger != scrollToDateTrigger {
+            context.coordinator.lastScrollToDateTrigger = scrollToDateTrigger
+
+            uiView.scroll(
+                toMonthContaining: scrollToDate,
+                scrollPosition: .centered,
+                animated: true
+            )
+
+            DispatchQueue.main.async {
+                notifyVisibleMonthIfNeeded(from: uiView, coordinator: context.coordinator)
+            }
+        } else {
+            DispatchQueue.main.async {
+                notifyVisibleMonthIfNeeded(from: uiView, coordinator: context.coordinator)
+            }
+        }
+    }
+
+    func configureSelectionHandler(for view: HorizonCalendar.CalendarView) {
+        view.daySelectionHandler = { day in
             guard let tappedDate = calendar.date(from: day.components) else { return }
             let normalized = calendar.startOfDay(for: tappedDate)
 
             guard normalized <= calendar.startOfDay(for: Date()) else { return }
             onDayTapped(normalized)
         }
+    }
 
-        uiView.backgroundColor = .clear
-        uiView.setContent(makeContent())
+    func configureScrollHandler(for view: HorizonCalendar.CalendarView) {
+        view.didScroll = { _, _ in
+            notifyVisibleMonthIfNeeded(from: view, coordinator: nil)
+        }
+    }
+
+    func notifyVisibleMonthIfNeeded(
+        from view: HorizonCalendar.CalendarView,
+        coordinator: Coordinator?
+    ) {
+        guard let visibleMonth = view.visibleMonthRange?.lowerBound else { return }
+        guard let monthDate = calendar.date(from: visibleMonth.components) else { return }
+
+        let normalizedMonthDate = calendar.date(
+            from: calendar.dateComponents([.year, .month], from: monthDate)
+        ) ?? monthDate
+
+        if let coordinator {
+            if coordinator.lastVisibleMonthDate == normalizedMonthDate { return }
+            coordinator.lastVisibleMonthDate = normalizedMonthDate
+        }
+
+        onVisibleMonthChanged(normalizedMonthDate)
     }
 
     private func makeContent() -> CalendarViewContent {
@@ -214,16 +297,17 @@ private struct HorizonCalendarContainerView: UIViewRepresentable {
             calendar: calendar,
             visibleDateRange: visibleDateRange,
             monthsLayout: .horizontal(
-                options: HorizontalMonthsLayoutOptions())
+                options: HorizontalMonthsLayoutOptions()
+            )
         )
         .monthHeaderItemProvider { month in
-            return CalendarMonthHeaderItemView(
+            CalendarMonthHeaderItemView(
                 month: calendar.date(from: month.components)!
             )
             .calendarItemModel
         }
         .dayOfWeekItemProvider { _, weekday in
-            return CalendarWeekdayItemView(
+            CalendarWeekdayItemView(
                 weekdayIndex: weekday
             )
             .calendarItemModel
@@ -249,6 +333,8 @@ private struct HorizonCalendarContainerView: UIViewRepresentable {
 
     final class Coordinator {
         var didScrollToInitialMonth = false
+        var lastScrollToDateTrigger: Int = 0
+        var lastVisibleMonthDate: Date?
     }
 }
 
@@ -263,8 +349,9 @@ private struct CalendarMonthHeaderItemView: View {
             .foregroundStyle(LunaraColor.cream)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, Constants.calendarInnerPadding)
-            .padding(.top, 2)
-            .padding(.bottom, 12)
+            .padding(.top, Constants.monthHeaderTopPadding)
+            .padding(.bottom, Constants.monthHeaderBottomPadding)
+            .frame(height: 52, alignment: .bottomLeading)
     }
 }
 
@@ -295,7 +382,7 @@ private struct CalendarDayItemView: View {
     var body: some View {
         VStack(spacing: 4) {
             Text("\(dayNumber)")
-                .font(LunaraFont.bodySmall)
+                .font(dayFont)
                 .foregroundStyle(textColor)
 
             Circle()
@@ -313,6 +400,13 @@ private struct CalendarDayItemView: View {
                 }
         )
         .opacity(isFuture ? 0.28 : 1)
+    }
+
+    private var dayFont: Font {
+        if isToday && !isSelected {
+            return .manropeSemiBold(size: 14)
+        }
+        return LunaraFont.bodySmall
     }
 
     private var textColor: Color {

@@ -12,8 +12,9 @@ import SwiftData
 struct LunaraApp: App {
     var body: some Scene {
         WindowGroup {
-             AppTabView()
+            RootView()
+                .preferredColorScheme(.dark)
         }
-        .modelContainer(SwiftDataContainer.shared)
+        .modelContainer(for: DreamEntry.self)
     }
 }

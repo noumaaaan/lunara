@@ -39,6 +39,7 @@ struct DreamDetailView: View {
                 .padding(Constants.screenPadding)
                 .padding(.bottom, 30)
             }
+            .scrollIndicators(.hidden)
 
             if showDeleteDialog {
                 ZStack {
@@ -149,8 +150,8 @@ private extension DreamDetailView {
 
     var dreamContentSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            if !entry.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                Text(entry.title)
+            if !trimmedTitle.isEmpty {
+                Text(trimmedTitle)
                     .font(.manropeSemiBold(size: 18))
                     .foregroundStyle(LunaraColor.cream)
             }
@@ -167,14 +168,7 @@ private extension DreamDetailView {
         }
         .padding(LunaraPadding.screen)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(
-            RoundedRectangle(cornerRadius: LunaraRadius.regular, style: .continuous)
-                .fill(LunaraColor.secondary)
-                .overlay {
-                    RoundedRectangle(cornerRadius: LunaraRadius.regular, style: .continuous)
-                        .stroke(LunaraColor.border, lineWidth: 1)
-                }
-        )
+        .background(cardBackground)
     }
 
     var dreamInformation: some View {
@@ -196,14 +190,7 @@ private extension DreamDetailView {
         }
         .padding(LunaraPadding.screen)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(
-            RoundedRectangle(cornerRadius: LunaraRadius.regular, style: .continuous)
-                .fill(LunaraColor.secondary)
-                .overlay {
-                    RoundedRectangle(cornerRadius: LunaraRadius.regular, style: .continuous)
-                        .stroke(LunaraColor.border, lineWidth: 1)
-                }
-        )
+        .background(cardBackground)
     }
 
     var categoryAndMoodSection: some View {
@@ -238,6 +225,19 @@ private extension DreamDetailView {
         }
         .frame(maxWidth: .infinity, alignment: .center)
         .padding(.bottom, 20)
+    }
+
+    var trimmedTitle: String {
+        entry.title.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    var cardBackground: some View {
+        RoundedRectangle(cornerRadius: LunaraRadius.regular, style: .continuous)
+            .fill(LunaraColor.secondary)
+            .overlay {
+                RoundedRectangle(cornerRadius: LunaraRadius.regular, style: .continuous)
+                    .stroke(LunaraColor.border, lineWidth: 1)
+            }
     }
 
     func deleteDream() {

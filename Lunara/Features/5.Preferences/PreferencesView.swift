@@ -12,6 +12,7 @@ private enum Constants {
     static let sectionSpacing: CGFloat = 18
     static let rowSpacing: CGFloat = 12
     static let rowHeight: CGFloat = 58
+    static let groupSpacing: CGFloat = 18
 }
 
 struct PreferencesView: View {
@@ -25,76 +26,8 @@ struct PreferencesView: View {
 
             ScrollView {
                 VStack(alignment: .leading, spacing: Constants.sectionSpacing) {
-                    sectionTitle("Preferences")
-
-                    VStack(spacing: Constants.rowSpacing) {
-                        NavigationLink {
-                            ProfileView()
-                        } label: {
-                            PreferenceRowView(
-                                title: "Profile",
-                                subtitle: displayName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Set your name" : displayName,
-                                iconSystemName: "person.crop.circle"
-                            )
-                        }
-                        .buttonStyle(.plain)
-
-                        NavigationLink {
-                            AboutLunaraView()
-                        } label: {
-                            PreferenceRowView(
-                                title: "About Lunara",
-                                subtitle: "What the app is about",
-                                iconSystemName: "sparkles"
-                            )
-                        }
-                        .buttonStyle(.plain)
-
-                        NavigationLink {
-                            WhyDoWeDreamView()
-                        } label: {
-                            PreferenceRowView(
-                                title: "Why do we dream?",
-                                subtitle: "A simple explanation",
-                                iconSystemName: "moon.stars"
-                            )
-                        }
-                        .buttonStyle(.plain)
-
-                        NavigationLink {
-                            PrivacyAndDataView()
-                        } label: {
-                            PreferenceRowView(
-                                title: "Privacy / Your data",
-                                subtitle: "How Lunara handles your entries",
-                                iconSystemName: "lock.shield"
-                            )
-                        }
-                        .buttonStyle(.plain)
-
-                        Button {
-                            openBuyMeACoffee()
-                        } label: {
-                            PreferenceRowView(
-                                title: "Buy Me a Coffee",
-                                subtitle: "Support Lunara",
-                                iconSystemName: "cup.and.saucer"
-                            )
-                        }
-                        .buttonStyle(.plain)
-
-                        Button {
-                            openSuggestions()
-                        } label: {
-                            PreferenceRowView(
-                                title: "Suggestions",
-                                subtitle: "Send feedback or ideas",
-                                iconSystemName: "envelope"
-                            )
-                        }
-                        .buttonStyle(.plain)
-                    }
-
+                    primaryGroup
+                    secondaryGroup
                     aboutFooter
                 }
                 .padding(.horizontal, LunaraPadding.screen)
@@ -110,7 +43,7 @@ struct PreferencesView: View {
         .toolbar {
             ToolbarItem(placement: .principal) {
                 Text("Preferences")
-                    .font(LunaraFont.bold)
+                    .font(.manropeBold(size: 18))
                     .foregroundStyle(LunaraColor.cream)
             }
         }
@@ -118,10 +51,87 @@ struct PreferencesView: View {
 }
 
 private extension PreferencesView {
-    func sectionTitle(_ title: String) -> some View {
-        Text(title)
-            .font(LunaraFont.semiBold)
-            .foregroundStyle(LunaraColor.cream)
+    var trimmedDisplayName: String {
+        displayName.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    var profileSubtitle: String {
+        trimmedDisplayName.isEmpty ? "Set your name" : trimmedDisplayName
+    }
+
+    var primaryGroup: some View {
+        VStack(spacing: Constants.rowSpacing) {
+            NavigationLink {
+                ProfileView()
+            } label: {
+                PreferenceRowView(
+                    title: "Profile",
+                    subtitle: profileSubtitle,
+                    iconSystemName: "person.crop.circle"
+                )
+            }
+            .buttonStyle(.plain)
+
+            NavigationLink {
+                AboutLunaraView()
+            } label: {
+                PreferenceRowView(
+                    title: "About Lunara",
+                    subtitle: "Learn more about the app",
+                    iconSystemName: "sparkles"
+                )
+            }
+            .buttonStyle(.plain)
+
+            NavigationLink {
+                WhyDoWeDreamView()
+            } label: {
+                PreferenceRowView(
+                    title: "Why do we dream?",
+                    subtitle: "A simple look at dreaming",
+                    iconSystemName: "moon.stars"
+                )
+            }
+            .buttonStyle(.plain)
+
+            NavigationLink {
+                PrivacyAndDataView()
+            } label: {
+                PreferenceRowView(
+                    title: "Privacy / Your data",
+                    subtitle: "How your entries are handled",
+                    iconSystemName: "lock.shield"
+                )
+            }
+            .buttonStyle(.plain)
+            
+            NavigationLink {
+                CreditsView()
+            } label: {
+                PreferenceRowView(
+                    title: "Credits",
+                    subtitle: "Fonts, icons, and libraries used",
+                    iconSystemName: "heart.text.square"
+                )
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
+    var secondaryGroup: some View {
+        VStack(spacing: Constants.rowSpacing) {
+            Button {
+                openSuggestions()
+            } label: {
+                PreferenceRowView(
+                    title: "Suggestions",
+                    subtitle: "Send feedback or ideas",
+                    iconSystemName: "envelope"
+                )
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(.top, Constants.groupSpacing)
     }
 
     var aboutFooter: some View {
@@ -133,9 +143,13 @@ private extension PreferencesView {
             Text(appVersionText)
                 .font(LunaraFont.lightExtraSmall)
                 .foregroundStyle(LunaraColor.cream.opacity(0.6))
+            
+            Text("Created by Noumaan Mehmood")
+                .font(LunaraFont.lightExtraSmall)
+                .foregroundStyle(LunaraColor.cream.opacity(0.6))
         }
         .frame(maxWidth: .infinity)
-        .padding(.top, 8)
+        .padding(.top, 18)
     }
 
     var appVersionText: String {
@@ -144,13 +158,8 @@ private extension PreferencesView {
         return "Version \(version) (\(build))"
     }
 
-    func openBuyMeACoffee() {
-        guard let url = URL(string: "https://buymeacoffee.com/YOUR_LINK") else { return }
-        openURL(url)
-    }
-
     func openSuggestions() {
-        guard let url = URL(string: "mailto:you@example.com?subject=Lunara%20Suggestion") else { return }
+        guard let url = URL(string: "mailto:lunara.dreams.app@gmail.com?subject=Lunara%20Suggestion") else { return }
         openURL(url)
     }
 }

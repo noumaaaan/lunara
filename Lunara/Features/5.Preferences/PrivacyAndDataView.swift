@@ -8,6 +8,12 @@
 import Foundation
 import SwiftUI
 
+private enum Constants {
+    static let sectionSpacing: CGFloat = 18
+    static let cardPadding: CGFloat = 16
+    static let bottomPadding: CGFloat = 100
+}
+
 struct PrivacyAndDataView: View {
     var body: some View {
         ZStack {
@@ -15,7 +21,9 @@ struct PrivacyAndDataView: View {
                 .ignoresSafeArea()
 
             ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
+                VStack(alignment: .leading, spacing: Constants.sectionSpacing) {
+                    headerSection
+
                     privacyCard(
                         title: "Your dreams",
                         body: "Your journal entries are personal. Lunara is designed to treat them that way."
@@ -23,22 +31,28 @@ struct PrivacyAndDataView: View {
 
                     privacyCard(
                         title: "Stored on your device",
-                        body: "In this version of Lunara, your dream data is stored locally on your device. There is no account system or cloud sync yet."
+                        body: "With Lunara, your dream data is stored locally on your device. There is no account system or cloud sync. No one other than you can see it."
                     )
 
                     privacyCard(
-                        title: "Suggestions and external links",
-                        body: "If you use Suggestions or Buy Me a Coffee, those actions open external apps or websites."
+                        title: "External actions",
+                        body: "If you use Suggestions, Lunara may open your mail app so you can send feedback. Any external app or website then follows its own privacy practices."
+                    )
+
+                    privacyCard(
+                        title: "No account required",
+                        body: "You can use Lunara without creating an account. That means there is currently no personal profile stored on external servers through the app."
                     )
 
                     privacyCard(
                         title: "Future changes",
-                        body: "If Lunara adds sync, export, or backup features later, privacy and data handling should be clearly explained here."
+                        body: "If Lunara adds sync, export, backup, or account features later, privacy and data handling will be clearly explained here."
                     )
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, LunaraPadding.screen)
                 .padding(.top, LunaraPadding.screen)
-                .padding(.bottom, 40)
+                .padding(.bottom, Constants.bottomPadding)
             }
             .scrollIndicators(.hidden)
         }
@@ -54,8 +68,44 @@ struct PrivacyAndDataView: View {
             }
         }
     }
+}
 
-    private func privacyCard(title: String, body: String) -> some View {
+private extension PrivacyAndDataView {
+    var headerSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 8) {
+                Image(systemName: "lock.shield.fill")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(LunaraColor.pink)
+
+                Text("PRIVACY")
+                    .font(LunaraFont.lightExtraSmall)
+                    .foregroundStyle(LunaraColor.cream.opacity(0.72))
+                    .textCase(.uppercase)
+            }
+
+            Text("Your dreams should feel private.")
+                .font(LunaraFont.semiBold)
+                .foregroundStyle(LunaraColor.cream)
+
+            Text("Lunara is built to keep things simple and personal. In this version, your entries stay on your device, with no account or cloud sync required.")
+                .font(LunaraFont.body)
+                .foregroundStyle(LunaraColor.cream.opacity(0.8))
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(Constants.cardPadding)
+        .background(
+            RoundedRectangle(cornerRadius: LunaraRadius.regular, style: .continuous)
+                .fill(LunaraColor.tertiary.opacity(0.5))
+                .overlay {
+                    RoundedRectangle(cornerRadius: LunaraRadius.regular, style: .continuous)
+                        .stroke(LunaraColor.border, lineWidth: 1)
+                }
+        )
+    }
+
+    func privacyCard(title: String, body: String) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             Text(title)
                 .font(LunaraFont.semiBold)
@@ -66,7 +116,8 @@ struct PrivacyAndDataView: View {
                 .foregroundStyle(LunaraColor.cream.opacity(0.8))
                 .fixedSize(horizontal: false, vertical: true)
         }
-        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(Constants.cardPadding)
         .background(
             RoundedRectangle(cornerRadius: LunaraRadius.regular, style: .continuous)
                 .fill(LunaraColor.secondary.opacity(0.72))

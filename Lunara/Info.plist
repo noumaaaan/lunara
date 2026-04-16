@@ -12,5 +12,10 @@
 		<string>Manrope-Regular.ttf</string>
 		<string>Manrope-SemiBold.ttf</string>
 	</array>
+	<key>UILaunchScreen</key>
+	<dict>
+		<key>LaunchScreen</key>
+		<dict/>
+	</dict>
 </dict>
 </plist>

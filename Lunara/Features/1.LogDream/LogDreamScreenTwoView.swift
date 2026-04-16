@@ -28,6 +28,8 @@ struct LogDreamScreenTwoView: View {
 
             ScrollView {
                 VStack(alignment: .leading, spacing: Constants.sectionSpacing) {
+                    headerSection
+                    
                     DateSelectionView(selectedDate: $viewModel.dreamDate)
 
                     CategorySelectionView(selectedCategory: $viewModel.selectedCategory)
@@ -95,9 +97,19 @@ struct LogDreamScreenTwoView: View {
 }
 
 private extension LogDreamScreenTwoView {
+    var headerSection: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("Add a few final details to complete your entry.")
+                .font(LunaraFont.bodySmall)
+                .foregroundStyle(LunaraColor.cream)
+        }
+        .padding(.horizontal, Constants.screenPadding)
+        .padding(.bottom, 2)
+    }
+    
     var saveSection: some View {
         CustomButton(
-            title: "Save Dream",
+            title: viewModel.isSaving ? "Saving..." : "Save Dream",
             style: .primary,
             height: 56,
             isDisabled: viewModel.isSaveDisabled || viewModel.isSaving

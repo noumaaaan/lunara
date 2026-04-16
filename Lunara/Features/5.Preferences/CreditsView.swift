@@ -1,8 +1,8 @@
 //
-//  WhyDoWeDreamView.swift
+//  CreditsView.swift
 //  Lunara
 //
-//  Created by Noumaan Mehmood on 26/03/2026.
+//  Created by Noumaan Mehmood on 16/04/2026.
 //
 
 import Foundation
@@ -14,7 +14,7 @@ private enum Constants {
     static let bottomPadding: CGFloat = 100
 }
 
-struct WhyDoWeDreamView: View {
+struct CreditsView: View {
     var body: some View {
         ZStack {
             LunaraColor.background
@@ -23,30 +23,19 @@ struct WhyDoWeDreamView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: Constants.sectionSpacing) {
                     headerSection
-
-                    textCard(
-                        title: "Why do we dream?",
-                        body: "There is no single final answer, but researchers generally think dreams are linked to memory, emotion, and the brain’s processing during sleep."
-                    )
-
-                    textCard(
-                        title: "Memory and learning",
-                        body: "Some theories suggest dreaming helps the brain sort, strengthen, and organise experiences from the day."
-                    )
-
-                    textCard(
-                        title: "Emotion and reflection",
-                        body: "Dreams may also reflect emotions, worries, hopes, or unresolved thoughts. That does not mean every dream has a hidden message, but patterns can still be meaningful."
-                    )
-
-                    textCard(
-                        title: "Why log them?",
-                        body: "Writing dreams down helps you remember them more clearly, notice recurring themes, and build your own sense of what they mean to you."
+                    
+                    creditsCard(
+                        title: "HorizonCalendar",
+                        body: "The calendar is powered by HorizonCalendar from Airbnb, making it smooth and delightful to browse dream entries by date.",
+                        link: "https://github.com/airbnb/HorizonCalendar",
+                        linkText: "View on GitHub"
                     )
                     
-                    textCard(
-                        title: "A gentle reminder",
-                        body: "Not every dream needs to be interpreted. Sometimes a dream is just a dream. Logging can still be helpful because it gives you space to reflect and notice what stands out over time."
+                    creditsCard(
+                        title: "Google Fonts & Material Icons",
+                        body: "Lunara uses Google Fonts for its beautiful and consistent typography. Some icons are based on Material Icons, helping keep the interface clean, clear, and expressive.",
+                        link: "https://fonts.google.com/icons",
+                        linkText: "View Icons"
                     )
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -62,7 +51,7 @@ struct WhyDoWeDreamView: View {
         .toolbarColorScheme(.dark, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .principal) {
-                Text("Why do we dream?")
+                Text("Credits")
                     .font(LunaraFont.bold)
                     .foregroundStyle(LunaraColor.cream)
             }
@@ -70,25 +59,25 @@ struct WhyDoWeDreamView: View {
     }
 }
 
-private extension WhyDoWeDreamView {
+private extension CreditsView {
     var headerSection: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 8) {
-                Image(systemName: "moon.stars.fill")
+                Image(systemName: "heart.text.square.fill")
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundStyle(LunaraColor.pink)
 
-                Text("DREAMING")
+                Text("CREDITS")
                     .font(LunaraFont.lightExtraSmall)
                     .foregroundStyle(LunaraColor.cream.opacity(0.72))
                     .textCase(.uppercase)
             }
 
-            Text("Dreams can be strange, emotional, vivid, or easily forgotten.")
+            Text("Made with love and open source")
                 .font(LunaraFont.semiBold)
                 .foregroundStyle(LunaraColor.cream)
 
-            Text("While there is still a lot we do not fully understand, dreaming is often linked to memory, emotion, and the way the brain processes experiences during sleep.")
+            Text("Lunara was built with care using beautiful tools and libraries from the open source community. A heartfelt thank you to everyone who creates and maintains them.")
                 .font(LunaraFont.body)
                 .foregroundStyle(LunaraColor.cream.opacity(0.8))
                 .fixedSize(horizontal: false, vertical: true)
@@ -105,16 +94,31 @@ private extension WhyDoWeDreamView {
         )
     }
 
-    func textCard(title: String, body: String) -> some View {
+    func creditsCard(title: String, body: String, link: String? = nil, linkText: String? = nil) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             Text(title)
                 .font(LunaraFont.semiBold)
                 .foregroundStyle(LunaraColor.cream)
-
+            
             Text(body)
                 .font(LunaraFont.body)
                 .foregroundStyle(LunaraColor.cream.opacity(0.8))
                 .fixedSize(horizontal: false, vertical: true)
+            
+            // Add the link if provided
+            if let link = link, let linkText = linkText {
+                Link(destination: URL(string: link)!) {
+                    HStack(spacing: 6) {
+                        Text(linkText)
+                            .font(LunaraFont.body)
+                            .foregroundStyle(LunaraColor.pink)   // or LunaraColor.accent if you have one
+                        
+                        Image(systemName: "arrow.up.right.square")
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundStyle(LunaraColor.pink)
+                    }
+                }
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(Constants.cardPadding)
@@ -131,6 +135,6 @@ private extension WhyDoWeDreamView {
 
 #Preview {
     NavigationStack {
-        WhyDoWeDreamView()
+        CreditsView()
     }
 }

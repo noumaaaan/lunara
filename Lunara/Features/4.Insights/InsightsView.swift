@@ -4,17 +4,20 @@
 //
 //  Created by Noumaan Mehmood on 25/03/2026.
 //
+
 import SwiftUI
 import SwiftData
 
 private enum Constants {
     static let screenPadding: CGFloat = 16
-    static let sectionSpacing: CGFloat = 22
+    static let sectionSpacing: CGFloat = 26
     static let gridSpacing: CGFloat = 12
     static let cardPadding: CGFloat = 16
+    static let summaryCardPadding: CGFloat = 18
     static let bottomContentPadding: CGFloat = 110
     static let barHeight: CGFloat = 10
     static let activityChartHeight: CGFloat = 150
+    static let sectionHeaderSpacing: CGFloat = 12
 }
 
 struct InsightsView: View {
@@ -52,7 +55,7 @@ struct InsightsView: View {
         .toolbar {
             ToolbarItem(placement: .principal) {
                 Text("Insights")
-                    .font(LunaraFont.bold)
+                    .font(.manropeBold(size: 18))
                     .foregroundStyle(LunaraColor.cream)
             }
         }
@@ -60,6 +63,22 @@ struct InsightsView: View {
 }
 
 private extension InsightsView {
+    var overviewColumns: [GridItem] {
+        [
+            GridItem(.flexible(), spacing: Constants.gridSpacing),
+            GridItem(.flexible(), spacing: Constants.gridSpacing)
+        ]
+    }
+
+    var cardBackground: some View {
+        RoundedRectangle(cornerRadius: LunaraRadius.regular, style: .continuous)
+            .fill(LunaraColor.secondary.opacity(0.72))
+            .overlay {
+                RoundedRectangle(cornerRadius: LunaraRadius.regular, style: .continuous)
+                    .stroke(LunaraColor.border, lineWidth: 1)
+            }
+    }
+
     var emptyState: some View {
         VStack(spacing: 14) {
             Image(systemName: "chart.bar.xaxis")
@@ -89,22 +108,29 @@ private extension InsightsView {
     }
 
     var summaryInsightCard: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text(summaryInsightTitle)
-                .font(LunaraFont.lightExtraSmall)
-                .foregroundStyle(LunaraColor.cream.opacity(0.7))
-                .textCase(.uppercase)
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 8) {
+                Image(systemName: "sparkles")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(LunaraColor.pink)
+
+                Text(summaryInsightTitle)
+                    .font(LunaraFont.lightExtraSmall)
+                    .foregroundStyle(LunaraColor.cream.opacity(0.72))
+                    .textCase(.uppercase)
+            }
 
             Text(summaryInsightText)
                 .font(LunaraFont.body)
                 .foregroundStyle(LunaraColor.cream)
                 .fixedSize(horizontal: false, vertical: true)
+                .lineSpacing(2)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(Constants.cardPadding)
+        .padding(Constants.summaryCardPadding)
         .background(
             RoundedRectangle(cornerRadius: LunaraRadius.regular, style: .continuous)
-                .fill(LunaraColor.tertiary.opacity(0.5))
+                .fill(LunaraColor.tertiary.opacity(0.58))
                 .overlay {
                     RoundedRectangle(cornerRadius: LunaraRadius.regular, style: .continuous)
                         .stroke(LunaraColor.border, lineWidth: 1)
@@ -113,14 +139,11 @@ private extension InsightsView {
     }
 
     var overviewSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: Constants.sectionHeaderSpacing) {
             sectionTitle("Overview")
 
             LazyVGrid(
-                columns: [
-                    GridItem(.flexible(), spacing: Constants.gridSpacing),
-                    GridItem(.flexible(), spacing: Constants.gridSpacing)
-                ],
+                columns: overviewColumns,
                 spacing: Constants.gridSpacing
             ) {
                 InsightSummaryCardView(
@@ -155,14 +178,14 @@ private extension InsightsView {
     }
 
     var categoryBreakdownSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: Constants.sectionHeaderSpacing) {
             sectionTitle("Dream Categories")
 
             VStack(spacing: 12) {
                 ForEach(categoryBreakdown, id: \.category) { item in
                     InsightBarRowView(
                         title: item.category.displayName,
-                        valueText: "\(item.count)",
+                        valueText: categoryValueText(for: item.count),
                         progress: item.progress,
                         fillColor: item.category.color
                     )
@@ -172,14 +195,14 @@ private extension InsightsView {
     }
 
     var moodBreakdownSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: Constants.sectionHeaderSpacing) {
             sectionTitle("Waking Moods")
 
             VStack(spacing: 12) {
                 ForEach(moodBreakdown, id: \.mood) { item in
                     InsightBarRowView(
                         title: item.mood.displayName,
-                        valueText: "\(item.count)",
+                        valueText: moodValueText(for: item.count),
                         progress: item.progress,
                         fillColor: item.mood.color
                     )
@@ -189,7 +212,7 @@ private extension InsightsView {
     }
 
     var activitySection: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: Constants.sectionHeaderSpacing) {
             sectionTitle("Last 4 Weeks")
 
             InsightActivityChartView(items: lastFourWeeksActivity)
@@ -200,6 +223,14 @@ private extension InsightsView {
         Text(title)
             .font(LunaraFont.semiBold)
             .foregroundStyle(LunaraColor.cream)
+    }
+
+    func categoryValueText(for count: Int) -> String {
+        count == 1 ? "1 dream" : "\(count) dreams"
+    }
+
+    func moodValueText(for count: Int) -> String {
+        count == 1 ? "1 time" : "\(count) times"
     }
 
     var summaryInsightTitle: String {
@@ -347,10 +378,10 @@ private struct InsightSummaryCardView: View {
                 Spacer()
             }
 
-            VStack(alignment: .leading, spacing: 6) {
+            VStack(alignment: .leading, spacing: 7) {
                 Text(title)
                     .font(LunaraFont.lightExtraSmall)
-                    .foregroundStyle(LunaraColor.cream.opacity(0.7))
+                    .foregroundStyle(LunaraColor.cream.opacity(0.68))
                     .textCase(.uppercase)
 
                 Text(value)
@@ -381,7 +412,7 @@ private struct InsightBarRowView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            HStack {
+            HStack(alignment: .firstTextBaseline) {
                 Text(title)
                     .font(LunaraFont.bodySmall)
                     .foregroundStyle(LunaraColor.cream)
@@ -390,7 +421,7 @@ private struct InsightBarRowView: View {
 
                 Text(valueText)
                     .font(LunaraFont.semiBoldSmall)
-                    .foregroundStyle(LunaraColor.cream.opacity(0.8))
+                    .foregroundStyle(LunaraColor.cream.opacity(0.78))
             }
 
             GeometryReader { geo in
@@ -419,16 +450,27 @@ private struct InsightBarRowView: View {
 
 private struct InsightActivityChartView: View {
     let items: [InsightActivityPoint]
-    private let calendar = Calendar.current
+
+    private static let weekFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "d MMM"
+        return formatter
+    }()
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
+            Text("Dreams logged per week")
+                .font(LunaraFont.lightExtraSmall)
+                .foregroundStyle(LunaraColor.cream.opacity(0.68))
+                .textCase(.uppercase)
+
             HStack(alignment: .bottom, spacing: 12) {
                 ForEach(items, id: \.weekStart) { item in
                     VStack(spacing: 8) {
                         GeometryReader { geo in
-                            VStack {
-                                Spacer()
+                            ZStack(alignment: .bottom) {
+                                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                    .fill(LunaraColor.secondary.opacity(0.35))
 
                                 RoundedRectangle(cornerRadius: 10, style: .continuous)
                                     .fill(LunaraColor.pink)
@@ -461,9 +503,7 @@ private struct InsightActivityChartView: View {
     }
 
     private func shortWeekLabel(for date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "d MMM"
-        return formatter.string(from: date)
+        Self.weekFormatter.string(from: date)
     }
 }
 

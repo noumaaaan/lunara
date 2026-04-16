@@ -18,6 +18,8 @@ private enum Constants {
 struct LogDreamScreenOneView: View {
     @Environment(\.modelContext) private var modelContext
     @EnvironmentObject private var router: AppRouter
+    
+    @AppStorage("displayName") private var displayName: String = ""
 
     @StateObject private var viewModel = LogDreamViewModel()
     @FocusState private var isDreamContentFocused: Bool
@@ -42,12 +44,10 @@ struct LogDreamScreenOneView: View {
                     .frame(minHeight: proxy.size.height, alignment: .top)
                 }
                 .scrollIndicators(.hidden)
-                .simultaneousGesture(
-                    TapGesture().onEnded {
-                        isDreamContentFocused = false
-                        isTitleFocused = false
-                    }
-                )
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    dismissKeyboard()
+                }
             }
         }
         .navigationBarTitleDisplayMode(.inline)
@@ -65,8 +65,7 @@ struct LogDreamScreenOneView: View {
                 Spacer()
 
                 Button("Done") {
-                    isDreamContentFocused = false
-                    isTitleFocused = false
+                    dismissKeyboard()
                 }
                 .font(LunaraFont.body)
             }
@@ -111,12 +110,24 @@ struct LogDreamScreenOneView: View {
 
 private extension LogDreamScreenOneView {
     var titleSection: some View {
-        CustomTextField(
-            text: $viewModel.title,
-            placeholder: "Optional title",
-            height: Constants.titleFieldHeight,
-            isFocused: $isTitleFocused
-        )
+        VStack(alignment: .leading, spacing: .zero) {
+            Text(welcomeTitle)
+                .font(LunaraFont.lightSmall)
+                .foregroundStyle(LunaraColor.cream.opacity(0.9))
+                .padding(.bottom, 10)
+
+            CustomTextField(
+                text: $viewModel.title,
+                placeholder: "Optional title",
+                height: Constants.titleFieldHeight,
+                isFocused: $isTitleFocused
+            )
+            .submitLabel(.next)
+            .onSubmit {
+                isTitleFocused = false
+                isDreamContentFocused = true
+            }
+        }
     }
 
     func contentSection(editorMinHeight: CGFloat) -> some View {
@@ -142,11 +153,12 @@ private extension LogDreamScreenOneView {
                 height: 56,
                 isDisabled: viewModel.isSaveDisabled || viewModel.isSaving
             ) {
+                dismissKeyboard()
                 shouldNavigateToDetails = true
             }
 
             CustomButton(
-                title: "Save for Now",
+                title: viewModel.isSaving ? "Saving..." : "Save for Now",
                 style: .secondary,
                 height: 50,
                 isDisabled: viewModel.isSaveDisabled || viewModel.isSaving
@@ -155,14 +167,29 @@ private extension LogDreamScreenOneView {
             }
         }
     }
+    
+    var welcomeTitle: String {
+        let trimmedName = displayName.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        if trimmedName.isEmpty {
+            return "Welcome, log your dream"
+        } else {
+            return "Welcome \(trimmedName), log your dream"
+        }
+    }
+
+    func dismissKeyboard() {
+        isDreamContentFocused = false
+        isTitleFocused = false
+    }
 
     func saveDream() {
         guard !viewModel.isSaving else { return }
 
+        dismissKeyboard()
+
         do {
             let savedEntry = try viewModel.saveDream(using: modelContext)
-            isDreamContentFocused = false
-            isTitleFocused = false
             router.handleDreamSaved(savedEntry.id)
         } catch {
             print("Failed to save dream: \(error)")

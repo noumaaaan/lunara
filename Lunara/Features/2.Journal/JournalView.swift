@@ -33,10 +33,14 @@ struct JournalView: View {
                 .ignoresSafeArea()
 
             ScrollView {
-                contentView
-                    .padding(.horizontal, Constants.screenPadding)
-                    .padding(.bottom, Constants.bottomContentPadding)
-                    .padding(.top, displayedDreamEntries.isEmpty ? 100 : 16)
+                VStack(alignment: .leading, spacing: 16) {
+                    headerSection
+                    
+                    contentView
+                }
+                .padding(.horizontal, Constants.screenPadding)
+                .padding(.bottom, Constants.bottomContentPadding)
+                .padding(.top, displayedDreamEntries.isEmpty ? 72 : 16)
             }
             .scrollIndicators(.hidden)
         }
@@ -60,12 +64,7 @@ struct JournalView: View {
                 } label: {
                     Image(selectedSortOption == .newestFirst ? "arrowDown" : "arrowUp")
                         .foregroundStyle(LunaraColor.cream)
-                        .transition(
-                            .asymmetric(
-                                insertion: .scale(scale: 0.9).combined(with: .opacity),
-                                removal: .scale(scale: 1.1).combined(with: .opacity)
-                            )
-                        )
+                        .contentTransition(.opacity)
                 }
                 .disabled(displayedDreamEntries.isEmpty)
                 .opacity(displayedDreamEntries.isEmpty ? 0.45 : 1)
@@ -109,6 +108,15 @@ struct JournalView: View {
 }
 
 private extension JournalView {
+    var headerSection: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(journalSubtitle)
+                .font(LunaraFont.bodySmall)
+                .foregroundStyle(LunaraColor.cream)
+        }
+        .padding(.bottom, displayedDreamEntries.isEmpty ? 8 : 4)
+    }
+    
     @ViewBuilder
     var contentView: some View {
         if displayedDreamEntries.isEmpty {
@@ -138,6 +146,17 @@ private extension JournalView {
         !selectedCategories.isEmpty
         || !selectedMoods.isEmpty
         || !selectedIntensities.isEmpty
+    }
+    
+    
+    var journalSubtitle: String {
+        if hasActiveFilters {
+            return "\(displayedDreamEntries.count) \(displayedDreamEntries.count == 1 ? "entry" : "entries") matching your filters"
+        } else if allDreamEntries.isEmpty {
+            return "Your saved dreams will appear here once you start logging them."
+        } else {
+            return "\(displayedDreamEntries.count) \(displayedDreamEntries.count == 1 ? "entry" : "entries") saved"
+        }
     }
 
     var displayedDreamEntries: [DreamEntry] {

@@ -16,60 +16,80 @@ private enum Constants {
 struct DreamIntensityView: View {
     @Binding var selectedIntensity: DreamIntensity
 
-    private let columns = Array(repeating: GridItem(.flexible(), spacing: Constants.gridSpacing), count: 5)
+    private let columns = Array(
+        repeating: GridItem(.flexible(), spacing: Constants.gridSpacing),
+        count: 5
+    )
 
     var body: some View {
         VStack(alignment: .leading, spacing: .zero) {
-            HStack(spacing: .zero) {
-                Text("How intense was it?")
-                    .font(LunaraFont.lightSmall)
-                    .foregroundStyle(LunaraColor.cream.opacity(0.9))
-
-                Spacer()
-
-                Text(selectedIntensity.displayName)
-                    .font(LunaraFont.semiBold)
-                    .foregroundStyle(LunaraColor.cream)
-            }
-            .padding(.bottom, 10)
+            headerSection
 
             LazyVGrid(columns: columns, alignment: .center, spacing: Constants.gridSpacing) {
                 ForEach(DreamIntensity.allCases, id: \.self) { intensity in
-                    Button {
-                        withAnimation(.spring(response: 0.28, dampingFraction: 0.75)) {
-                            selectedIntensity = intensity
-                        }
-                    } label: {
-                        Text(String(intensity.rawValue))
-                            .font(LunaraFont.semiBold)
-                            .foregroundStyle(foregroundColor(for: intensity))
-                            .frame(maxWidth: .infinity)
-                            .frame(height: Constants.itemHeight)
-                            .background(background(for: intensity))
-                            .scaleEffect(intensity == selectedIntensity ? 1.1 : 1)
-                    }
-                    .buttonStyle(.plain)
+                    intensityButton(for: intensity)
                 }
             }
         }
         .padding(.horizontal, Constants.horizontalPadding)
     }
+}
 
-    private func foregroundColor(for intensity: DreamIntensity) -> Color {
-        intensity == selectedIntensity ? LunaraColor.cream : intensity.color
+private extension DreamIntensityView {
+    var headerSection: some View {
+        HStack(spacing: .zero) {
+            Text("How intense was it?")
+                .font(LunaraFont.lightSmall)
+                .foregroundStyle(LunaraColor.cream.opacity(0.9))
+
+            Spacer()
+
+            Text(selectedIntensity.displayName)
+                .font(LunaraFont.semiBold)
+                .foregroundStyle(LunaraColor.cream)
+                .contentTransition(.opacity)
+                .animation(.easeInOut(duration: 0.18), value: selectedIntensity)
+        }
+        .padding(.bottom, 10)
     }
 
     @ViewBuilder
-    private func background(for intensity: DreamIntensity) -> some View {
-        RoundedRectangle(cornerRadius: LunaraRadius.regular, style: .continuous)
-            .fill(intensity == selectedIntensity ? intensity.color : LunaraColor.secondary.opacity(0.35))
-            .overlay {
-                RoundedRectangle(cornerRadius: LunaraRadius.regular, style: .continuous)
-                    .stroke(
-                        intensity == selectedIntensity ? LunaraColor.focusedBorder : LunaraColor.border,
-                        lineWidth: 1
-                    )
+    func intensityButton(for intensity: DreamIntensity) -> some View {
+        Button {
+            guard selectedIntensity != intensity else { return }
+
+            withAnimation(.spring(response: 0.28, dampingFraction: 0.8)) {
+                selectedIntensity = intensity
             }
+        } label: {
+            ZStack {
+                RoundedRectangle(cornerRadius: LunaraRadius.regular, style: .continuous)
+                    .fill(intensity == selectedIntensity ? intensity.color : LunaraColor.secondary.opacity(0.35))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: LunaraRadius.regular, style: .continuous)
+                            .stroke(
+                                intensity == selectedIntensity ? LunaraColor.focusedBorder : LunaraColor.border,
+                                lineWidth: 1
+                            )
+                    }
+
+                Text(String(intensity.rawValue))
+                    .font(LunaraFont.semiBold)
+                    .foregroundStyle(foregroundColor(for: intensity))
+                    .scaleEffect(intensity == selectedIntensity ? 1.08 : 1)
+            }
+            .frame(maxWidth: .infinity)
+            .frame(height: Constants.itemHeight)
+        }
+        .buttonStyle(.plain)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(intensity.displayName)
+        .accessibilityValue("\(intensity.rawValue)")
+        .accessibilityAddTraits(intensity == selectedIntensity ? [.isButton, .isSelected] : .isButton)
+    }
+
+    func foregroundColor(for intensity: DreamIntensity) -> Color {
+        intensity == selectedIntensity ? LunaraColor.cream : intensity.color
     }
 }
 
@@ -90,4 +110,3 @@ private struct DreamIntensityViewWrapper: View {
 #Preview {
     DreamIntensityViewWrapper()
 }
-

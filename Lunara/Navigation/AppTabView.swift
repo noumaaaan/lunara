@@ -47,6 +47,7 @@ struct AppTabView: View {
 
             CustomTabView(selectedTab: $router.selectedTab)
                 .opacity(router.toastMessage == nil ? 1 : 0)
+                .ignoresSafeArea(.keyboard, edges: .bottom)
         }
         .overlay {
             if let message = router.toastMessage {
